@@ -223,6 +223,3 @@ SKILL.md → advanced.md → details.md
 
 ---
 
-## 🔗 章节导航
-
-← [上一章：03-YAML Frontmatter 的精髓——写好 description 是成功的一半](./chapters/03-YAML Frontmatter 的精髓——写好 description 是成功的一半.md) | [下一章：05-三档自由度——如何把控指令的粗细粒度](./chapters/05-三档自由度——如何把控指令的粗细粒度.md) →

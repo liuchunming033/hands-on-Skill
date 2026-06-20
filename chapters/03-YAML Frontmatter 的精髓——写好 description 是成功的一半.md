@@ -224,6 +224,3 @@ git diffs, or when reviewing staged changes."
 
 ---
 
-## 🔗 章节导航
-
-← [上一章：02-Skill 长什么样？—— 文件结构与核心规范](./chapters/02-Skill 长什么样？—— 文件结构与核心规范.md) | [下一章：04-渐进式披露——Skill 碾压传统 Prompt 的核心设计原理](./chapters/04-渐进式披露——Skill 碾压传统 Prompt 的核心设计原理.md) →

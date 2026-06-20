@@ -301,6 +301,3 @@ HTTP 500 Internal Server Error
 
 ---
 
-## 🔗 章节导航
-
-← [上一章：07-ToolWrapper 模式——按需注入知识](./chapters/07-ToolWrapper 模式——按需注入知识.md) | [下一章：09-Reviewer 模式——分离审查与检查规则](./chapters/09-Reviewer 模式——分离审查与检查规则.md) →
