@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上手 Skill — 封面</title>
+<style>
+  @page { size: A4; margin: 0; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --paper: #F4EFE6;
+    --ink: #1a1a1a;
+    --ink-mid: #444;
+    --ink-light: #777;
+    --accent: #C41E3A;
+    --rule: #d9d2c5;
+  }
+
+  body {
+    width: 1240px;
+    height: 1754px;
+    background: var(--paper);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    color: var(--ink);
+    position: relative;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Paper texture */
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .cover {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    padding: 170px 0 0 116px;
+  }
+
+  /* Top accent line */
+  .top-rule {
+    width: 48px;
+    height: 3px;
+    background: var(--accent);
+    margin-bottom: 110px;
+  }
+
+  /* Title */
+  .title-cn {
+    font-family: "Songti SC", "Noto Serif SC", "STSong", "SimSun", serif;
+    font-size: 120px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .title-en-line1 {
+    font-family: "Georgia", "Times New Roman", "STIX Two Text", serif;
+    font-size: 130px;
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+
+  .title-en-line2 {
+    font-family: "Georgia", "Times New Roman", "STIX Two Text", serif;
+    font-size: 185px;
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: -0.015em;
+    line-height: 1;
+    color: var(--ink);
+    margin-top: -8px;
+  }
+
+  /* Subtitle separator */
+  .sub-rule {
+    width: 36px;
+    height: 1px;
+    background: var(--rule);
+    margin: 64px 0 38px 0;
+  }
+
+  /* Subtitle */
+  .subtitle {
+    font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+    font-size: 37px;
+    font-weight: 300;
+    letter-spacing: 0.13em;
+    line-height: 1.75;
+    color: var(--ink-mid);
+  }
+
+  /* Description */
+  .desc {
+    font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.09em;
+    line-height: 2.1;
+    color: #999;
+    max-width: 520px;
+    margin-top: 42px;
+  }
+
+  /* Bottom section */
+  .bottom-section {
+    position: absolute;
+    bottom: 120px;
+    left: 116px;
+    right: 116px;
+  }
+
+  .bottom-rule {
+    width: 100%;
+    height: 1px;
+    background: var(--rule);
+    margin-bottom: 44px;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .audience {
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 0.07em;
+    color: #aaa;
+    line-height: 1.8;
+  }
+
+  /* Editor credit — middle-right */
+  .editor-credit {
+    position: absolute;
+    right: 116px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: "Songti SC", "Noto Serif SC", "STSong", "SimSun", serif;
+    font-size: 34px;
+    font-weight: 400;
+    letter-spacing: 0.10em;
+    color: #999;
+    text-align: right;
+    z-index: 1;
+  }
+
+  .tagline {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 17px;
+    font-style: italic;
+    letter-spacing: 0.18em;
+    color: #c5c0b5;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  /* Update notice */
+  .update-notice {
+    position: absolute;
+    left: 116px;
+    right: 116px;
+    bottom: 210px;
+    font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+    font-size: 19px;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    color: #bbb;
+    z-index: 1;
+  }
+
+  /* Node cluster */
+  .accent-nodes {
+    position: absolute;
+    right: 132px;
+    top: 340px;
+    z-index: 0;
+  }
+
+  .node-group {
+    position: relative;
+    width: 270px;
+    height: 270px;
+  }
+
+  .node {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+
+  .n-lg  { width: 13px; height: 13px; top: 36px;  left: 168px; opacity: 0.50; }
+  .n-md1 { width: 8px;  height: 8px;  top: 5px;   left: 148px; opacity: 0.32; }
+  .n-md2 { width: 8px;  height: 8px;  top: 28px;  left: 220px; opacity: 0.32; }
+  .n-md3 { width: 8px;  height: 8px;  top: 102px; left: 184px; opacity: 0.32; }
+  .n-md4 { width: 8px;  height: 8px;  top: 175px; left: 224px; opacity: 0.32; }
+  .n-sm1 { width: 4px;  height: 4px;  top: 70px;  left: 86px;  opacity: 0.18; }
+  .n-sm2 { width: 4px;  height: 4px;  top: 120px; left: 248px; opacity: 0.18; }
+  .n-sm3 { width: 4px;  height: 4px;  top: 150px; left: 50px;  opacity: 0.18; }
+  .n-sm4 { width: 4px;  height: 4px;  top: 160px; left: 134px; opacity: 0.18; }
+  .n-accent { width: 9px; height: 9px; top: 130px; left: 120px; opacity: 0.65; background: var(--accent); }
+  .n-xs1 { width: 3px;  height: 3px;  top: 208px; left: 100px; opacity: 0.10; }
+  .n-xs2 { width: 3px;  height: 3px;  top: 218px; left: 165px; opacity: 0.10; }
+  .n-xs3 { width: 3px;  height: 3px;  top: 232px; left: 35px;  opacity: 0.10; }
+  .n-xs4 { width: 3px;  height: 3px;  top: 240px; left: 198px; opacity: 0.10; }
+
+  /* Connecting lines */
+  .edge {
+    position: absolute;
+    height: 1px;
+    background: var(--ink);
+    opacity: 0.07;
+    transform-origin: left center;
+  }
+
+  .e1 { top: 8px;   left: 152px; width: 72px;  transform: rotate(18deg); }
+  .e2 { top: 72px;  left: 90px;  width: 98px;  transform: rotate(26deg); }
+  .e3 { top: 105px; left: 188px; width: 64px;  transform: rotate(14deg); }
+  .e4 { top: 153px; left: 54px;  width: 84px;  transform: rotate(28deg); }
+  .e5 { top: 162px; left: 138px; width: 90px;  transform: rotate(-7deg); }
+  .e6 { top: 220px; left: 38px;  width: 66px;  transform: rotate(33deg); }
+  .e7 { top: 178px; left: 228px; width: 42px;  transform: rotate(-18deg); }
+  .e8 { top: 216px; left: 104px; width: 65px;  transform: rotate(-4deg); }
+
+  /* Version mark */
+  .version-mark {
+    position: absolute;
+    top: 82px;
+    right: 116px;
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 14px;
+    font-style: italic;
+    letter-spacing: 0.18em;
+    color: #c5c0b5;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+  <div class="version-mark">v1.0</div>
+
+  <div class="cover">
+    <!-- Top accent line -->
+    <div class="top-rule"></div>
+
+    <!-- Title -->
+    <div class="title-cn">上手</div>
+    <div class="title-en-line1">Hands on</div>
+    <div class="title-en-line2">Skill</div>
+
+    <!-- Subtitle separator -->
+    <div class="sub-rule"></div>
+
+    <!-- Subtitle -->
+    <div class="subtitle">
+      Agent Skill<br>
+      设计、实战与评估全指南
+    </div>
+
+    <!-- Description -->
+    <div class="desc">
+      从 0 到 1 掌握 Agent 能力构建<br>
+      让 AI 真正成为生产力工具
+    </div>
+
+    <!-- Editor credit -->
+    <div class="editor-credit">编者：春和景明</div>
+
+    <!-- Bottom section -->
+    <div class="bottom-section">
+      <div class="bottom-rule"></div>
+      <div class="meta">
+        <div class="audience">
+          适合读者&ensp;·&ensp;AI 工程师&ensp;·&ensp;产品经理&ensp;·&ensp;技术团队负责人
+        </div>
+        <div class="tagline">Learn by Doing</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Node constellation -->
+  <div class="accent-nodes">
+    <div class="node-group">
+      <div class="node n-lg"></div>
+      <div class="node n-md1"></div>
+      <div class="node n-md2"></div>
+      <div class="node n-md3"></div>
+      <div class="node n-md4"></div>
+      <div class="node n-sm1"></div>
+      <div class="node n-sm2"></div>
+      <div class="node n-sm3"></div>
+      <div class="node n-sm4"></div>
+      <div class="node n-accent"></div>
+      <div class="node n-xs1"></div>
+      <div class="node n-xs2"></div>
+      <div class="node n-xs3"></div>
+      <div class="node n-xs4"></div>
+
+      <div class="edge e1"></div>
+      <div class="edge e2"></div>
+      <div class="edge e3"></div>
+      <div class="edge e4"></div>
+      <div class="edge e5"></div>
+      <div class="edge e6"></div>
+      <div class="edge e7"></div>
+      <div class="edge e8"></div>
+    </div>
+  </div>
+</body>
+</html>

@@ -46,7 +46,7 @@ description: 一句话描述技能功能和触发场景
 ---
 ```
 
-**实际案例**（来自知识库中的真实 SKILL.md）：
+**实际案例**：
 
 **案例 1：follow-builders Skill**
 
