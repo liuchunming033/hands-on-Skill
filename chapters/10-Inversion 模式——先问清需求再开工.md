@@ -249,4 +249,4 @@ Agent：[生成迁移脚本]
 
 ## 🔗 章节导航
 
-← [上一章：09-Reviewer 模式——分离审查与检查规则](./09-Reviewer 模式——分离审查与检查规则.md) | [下一章：11-Pipeline 模式——分步执行流程](./11-Pipeline 模式——分步执行流程.md) →
+← [上一章：09-Reviewer 模式——分离审查与检查规则](./chapters/09-Reviewer 模式——分离审查与检查规则.md) | [下一章：11-Pipeline 模式——分步执行流程](./chapters/11-Pipeline 模式——分步执行流程.md) →

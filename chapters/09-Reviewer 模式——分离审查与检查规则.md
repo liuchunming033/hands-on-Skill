@@ -264,4 +264,4 @@ security-review/
 
 ## 🔗 章节导航
 
-← [上一章：08-Generator 模式——固定输出结构](./08-Generator 模式——固定输出结构.md) | [下一章：10-Inversion 模式——先问清需求再开工](./10-Inversion 模式——先问清需求再开工.md) →
+← [上一章：08-Generator 模式——固定输出结构](./chapters/08-Generator 模式——固定输出结构.md) | [下一章：10-Inversion 模式——先问清需求再开工](./chapters/10-Inversion 模式——先问清需求再开工.md) →

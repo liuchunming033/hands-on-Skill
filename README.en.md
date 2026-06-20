@@ -69,7 +69,7 @@ The AI era rewards **builders who actually build**. If you just want the format 
 
 ### Prologue
 
-- [00 — Agent Architecture Overview](./00-导言——Agent架构全景：四大组件定位.md) — How Prompt, Skill, Subagent, and MCP fit together
+- [00 — Agent Architecture Overview](./chapters/00-导言——Agent架构全景：四大组件定位.md) — How Prompt, Skill, Subagent, and MCP fit together
 
 ---
 

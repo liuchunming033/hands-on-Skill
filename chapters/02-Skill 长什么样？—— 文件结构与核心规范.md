@@ -245,4 +245,4 @@ pdf/
 
 ## 🔗 章节导航
 
-← [上一章：01-为什么要学 Skill？—— 通用智能体的最后一公里](./01-为什么要学 Skill？—— 通用智能体的最后一公里.md) | [下一章：03-YAML Frontmatter 的精髓——写好 description 是成功的一半](./03-YAML Frontmatter 的精髓——写好 description 是成功的一半.md) →
+← [上一章：01-为什么要学 Skill？—— 通用智能体的最后一公里](./chapters/01-为什么要学 Skill？—— 通用智能体的最后一公里.md) | [下一章：03-YAML Frontmatter 的精髓——写好 description 是成功的一半](./chapters/03-YAML Frontmatter 的精髓——写好 description 是成功的一半.md) →
