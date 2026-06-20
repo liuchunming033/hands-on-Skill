@@ -33,7 +33,6 @@ echo "  ✓ README"
 
 # 按顺序逐章生成 PDF
 INDEX=1
-APPENDIX_NUM=0
 for f in \
   "chapters/00-导言——Agent架构全景：四大组件定位" \
   "chapters/01-为什么要学 Skill？—— 通用智能体的最后一公里" \
@@ -63,26 +62,17 @@ for f in \
   "chapters/25-A-B对比测试——持续验证与优化" \
   "chapters/26-Skill 的长期维护与团队管理" \
   "chapters/27-Skill 安全三原则——强大能力的风险管理" \
-  "appendices/附录-Anthropic 的 9 大 Skill 分类——团队能力诊断地图" \
-  "appendices/附录-OpenAI的Skill实践案例——代码助手能力构建" \
-  "appendices/附录-Superpowers开源Skill库——社区驱动的能力复用" \
-  "appendices/附录-addyosmani-agent-skills——生产级Skill工作流设计" \
-  "appendices/附录-garrytan-gstack——创业者导向的完整产品研发流程" \
-  "appendices/附录-google-skills——平台化产品的安全Agent入口设计" \
+  "appendices/附录1-Anthropic 的 9 大 Skill 分类——团队能力诊断地图" \
+  "appendices/附录2-OpenAI的Skill实践案例——代码助手能力构建" \
+  "appendices/附录3-Superpowers开源Skill库——社区驱动的能力复用" \
+  "appendices/附录4-addyosmani-agent-skills——生产级Skill工作流设计" \
+  "appendices/附录5-garrytan-gstack——创业者导向的完整产品研发流程" \
+  "appendices/附录6-google-skills——平台化产品的安全Agent入口设计" \
 ; do
   file="${f}.md"
   if [ -f "$file" ]; then
     basename=$(basename "$file" .md)
-
-    # 附录：编号为 附录1、附录2...
-    if [[ "$f" == appendices/* ]]; then
-      APPENDIX_NUM=$((APPENDIX_NUM + 1))
-      body="${basename#附录-}"
-      title="附录${APPENDIX_NUM}-${body}"
-    else
-      # 章节：保留文件名中的序号（如 01-、02-）
-      title="$basename"
-    fi
+    title="$basename"
 
     html_name=$(printf '%03d' $INDEX)-chapter.html
     pdf_name=$(printf '%03d' $INDEX)-chapter.pdf

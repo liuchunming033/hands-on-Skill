@@ -140,12 +140,12 @@ AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎
 
 ### 附录
 
-- [附录-Anthropic 的 9 大 Skill 分类——团队能力诊断地图](./附录-Anthropic%20的%209%20大%20Skill%20分类——团队能力诊断地图.md) — Anthropic 官方 Skill 类型分类体系（认知→生产→验证→交付）
-- [附录-OpenAI 的 Skill 实践案例——代码助手能力构建](./appendices/附录-OpenAI的Skill实践案例——代码助手能力构建.md) — OpenAI Codex 真实 Skill 库（持续监控 + Subagent 并行审查 + 注意力量化 + 失败路径设计）
-- [附录-Superpowers 开源 Skill 库——社区驱动的能力复用](./appendices/附录-Superpowers开源Skill库——社区驱动的能力复用.md) — 社区驱动完整工程纪律系统（Red Flags 表 + Iron Law + Hard Gate + 文件传递 + Progress Ledger）
-- [附录-addyosmani-agent-skills——生产级 Skill 工作流设计](./appendices/附录-addyosmani-agent-skills——生产级Skill工作流设计.md) — Google 工程总监 Addy Osmani 的生产级 Skill 工作流库
-- [附录-garrytan-gstack——创业者导向的完整产品研发流程](./appendices/附录-garrytan-gstack——创业者导向的完整产品研发流程.md) — YC 总裁 Garry Tan 的单人全栈工程体系（四大基石：Ethos 注入 + preamble-tier 编排 + Preamble Bash + GBrain Schema 跨会话记忆）
-- [附录-google-skills——平台化产品的安全 Agent 入口设计](./appendices/附录-google-skills——平台化产品的安全Agent入口设计.md) — Google 官方 Skill 库，35 个云端产品 Skill（安全护栏 + 数据缩减 + 强制前置验证 + 渐进式加载）
+- [附录1-Anthropic 的 9 大 Skill 分类——团队能力诊断地图](./appendices/附录1-Anthropic%20的%209%20大%20Skill%20分类——团队能力诊断地图.md) — Anthropic 官方 Skill 类型分类体系（认知→生产→验证→交付）
+- [附录2-OpenAI 的 Skill 实践案例——代码助手能力构建](./appendices/附录2-OpenAI的Skill实践案例——代码助手能力构建.md) — OpenAI Codex 真实 Skill 库（持续监控 + Subagent 并行审查 + 注意力量化 + 失败路径设计）
+- [附录3-Superpowers 开源 Skill 库——社区驱动的能力复用](./appendices/附录3-Superpowers开源Skill库——社区驱动的能力复用.md) — 社区驱动完整工程纪律系统（Red Flags 表 + Iron Law + Hard Gate + 文件传递 + Progress Ledger）
+- [附录4-addyosmani-agent-skills——生产级 Skill 工作流设计](./appendices/附录4-addyosmani-agent-skills——生产级Skill工作流设计.md) — Google 工程总监 Addy Osmani 的生产级 Skill 工作流库
+- [附录5-garrytan-gstack——创业者导向的完整产品研发流程](./appendices/附录5-garrytan-gstack——创业者导向的完整产品研发流程.md) — YC 总裁 Garry Tan 的单人全栈工程体系（四大基石：Ethos 注入 + preamble-tier 编排 + Preamble Bash + GBrain Schema 跨会话记忆）
+- [附录6-google-skills——平台化产品的安全 Agent 入口设计](./appendices/附录6-google-skills——平台化产品的安全Agent入口设计.md) — Google 官方 Skill 库，35 个云端产品 Skill（安全护栏 + 数据缩减 + 强制前置验证 + 渐进式加载）
 
 ---
 

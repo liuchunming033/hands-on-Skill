@@ -151,12 +151,12 @@ The AI era rewards **builders who actually build**. If you just want the format 
 
 | Appendix | Repository / Source | What You'll Learn |
 |----------|-------------------|-------------------|
-| Anthropic's 9 Skill Categories | [Anthropic Docs](https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills) | Team capability diagnosis map (Cognition → Production → Validation → Delivery) |
-| OpenAI Codex Skills | [openai/codex](https://github.com/openai/codex/tree/main/.codex/skills) | Continuous PR monitoring, subagent parallel review, attention markers, failure path design |
-| Superpowers | [obra/superpowers](https://github.com/obra/superpowers) | Red Flags table, Iron Law, Hard Gates, file handoffs, Progress Ledger |
-| addyosmani/agent-skills | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | Production-grade Skill workflow design with mandatory check gates |
-| garrytan/gstack | [garrytan/gstack](https://github.com/garrytan/gstack) | Solo full-stack engineering system: Ethos injection, preamble-tier, Preamble Bash, GBrain schema |
-| google/skills | [google/skills](https://github.com/google/skills) | Platform-side safe Agent entry design (35 cloud product Skills) |
+| 附录1 — Anthropic's 9 Skill Categories | [Anthropic Docs](https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills) | Team capability diagnosis map (Cognition → Production → Validation → Delivery) |
+| 附录2 — OpenAI Codex Skills | [openai/codex](https://github.com/openai/codex/tree/main/.codex/skills) | Continuous PR monitoring, subagent parallel review, attention markers, failure path design |
+| 附录3 — Superpowers | [obra/superpowers](https://github.com/obra/superpowers) | Red Flags table, Iron Law, Hard Gates, file handoffs, Progress Ledger |
+| 附录4 — addyosmani/agent-skills | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | Production-grade Skill workflow design with mandatory check gates |
+| 附录5 — garrytan/gstack | [garrytan/gstack](https://github.com/garrytan/gstack) | Solo full-stack engineering system: Ethos injection, preamble-tier, Preamble Bash, GBrain schema |
+| 附录6 — google/skills | [google/skills](https://github.com/google/skills) | Platform-side safe Agent entry design (35 cloud product Skills) |
 
 ---
 
