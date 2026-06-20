@@ -13,26 +13,48 @@ mkdir -p "$BUILD_DIR"
 cp style.css "$BUILD_DIR/"
 cp -r images "$BUILD_DIR/images"
 
-PANDOC_OPTS="--from=markdown+smart --to=html5 --standalone --no-highlight --css=style.css"
+# pandoc 选项（非 standalone，只生成 HTML 片段）
+PANDOC_OPTS="--from=markdown+smart --to=html5 --no-highlight"
 
-echo "📖 生成 README..."
+echo "📖 构建组合 HTML..."
 
-# 去掉标题行和语言切换行
-tail -n +4 README.md > "$BUILD_DIR/README-tmp.md"
+# Step 1: 生成 README body HTML（去掉前3行，预处理列表空行）
+tail -n +4 README.md | python3 normalize-md.py | pandoc $PANDOC_OPTS -o "$BUILD_DIR/README-body.html"
 
-pandoc "$BUILD_DIR/README-tmp.md" \
-  $PANDOC_OPTS \
-  --metadata title="上手 Skill" \
-  --metadata date="$TODAY" \
-  -o "$BUILD_DIR/000-README.html"
-rm "$BUILD_DIR/README-tmp.md"
+# Step 2: 用 Python 将 README 中的章节链接替换为内部锚点
+python3 -c "
+import re, sys
 
-node print-to-pdf.js "$BUILD_DIR/000-README.html" "$BUILD_DIR/000-README.pdf"
+with open('$BUILD_DIR/README-body.html', 'r') as f:
+    html = f.read()
 
-echo "  ✓ README"
+# 替换章节链接: ./chapters/XX-...md → #chXX
+html = re.sub(r'href=\"\./chapters/(\d{2})-[^\"]+\.md\"', r'href=\"#ch\1\"', html)
 
-# 按顺序逐章生成 PDF
-INDEX=1
+# 替换附录链接: ./appendices/附录N-...md → #appendixN
+html = re.sub(r'href=\"\./appendices/附录(\d+)-[^\"]+\.md\"', r'href=\"#appendix\1\"', html)
+
+with open('$BUILD_DIR/README-body.html', 'w') as f:
+    f.write(html)
+"
+
+# Step 3: 初始化组合 HTML，写入头部和 README body
+cat > "$BUILD_DIR/combined.html" << 'HEADER_EOF'
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+HEADER_EOF
+
+# 追加 README body
+cat "$BUILD_DIR/README-body.html" >> "$BUILD_DIR/combined.html"
+rm "$BUILD_DIR/README-body.html"
+
+# Step 4: 逐章生成 HTML 片段，包裹在 <section class="chapter" id="chXX"> 中
+INDEX=0
 for f in \
   "chapters/00-导言——Agent架构全景：四大组件定位" \
   "chapters/01-为什么要学 Skill？—— 通用智能体的最后一公里" \
@@ -72,28 +94,54 @@ for f in \
   file="${f}.md"
   if [ -f "$file" ]; then
     basename=$(basename "$file" .md)
-    title="$basename"
 
-    html_name=$(printf '%03d' $INDEX)-chapter.html
-    pdf_name=$(printf '%03d' $INDEX)-chapter.pdf
-    echo "  📄 $title"
+    # 生成章节 ID
+    if [[ "$f" == appendices/* ]]; then
+      # 附录: 提取数字 → appendix1, appendix2, ...
+      appendix_num=$(echo "$basename" | grep -oE '^附录([0-9]+)' | grep -oE '[0-9]+')
+      section_id="appendix${appendix_num}"
+      chapter_title="附录${appendix_num}"
+    else
+      # 章节: 提取数字 → ch00, ch01, ch02, ...
+      chapter_num=$(echo "$basename" | grep -oE '^[0-9]+')
+      section_id="ch${chapter_num}"
+      chapter_title="$basename"
+    fi
 
-    # 调整图片路径：chapters/ 下的文件引用 ../images/ → images/
-    sed 's|(../images/|(images/|g' "$file" | pandoc \
-      $PANDOC_OPTS \
-      --metadata title="$title" \
-      -o "$BUILD_DIR/$html_name"
+    echo "  📄 [$section_id] $chapter_title"
 
-    node print-to-pdf.js "$BUILD_DIR/$html_name" "$BUILD_DIR/$pdf_name"
+    # 调整图片路径 + 预处理列表空行 → pandoc 生成 HTML 片段
+    sed 's|(../images/|(images/|g' "$file" | python3 normalize-md.py | pandoc $PANDOC_OPTS -o "$BUILD_DIR/fragment.html"
 
-    INDEX=$((INDEX + 1))
+    # 包裹在 <section class="chapter" id="chXX"> 中，追加到 combined.html
+    echo "<section class=\"chapter\" id=\"$section_id\">" >> "$BUILD_DIR/combined.html"
+    cat "$BUILD_DIR/fragment.html" >> "$BUILD_DIR/combined.html"
+    echo "</section>" >> "$BUILD_DIR/combined.html"
+    rm "$BUILD_DIR/fragment.html"
   fi
 done
 
-echo ""
-echo "🔗 拼接 PDF + 写书签..."
+# 关闭 body 和 html 标签
+echo "</body>" >> "$BUILD_DIR/combined.html"
+echo "</html>" >> "$BUILD_DIR/combined.html"
 
-python3 merge.py "$BUILD_DIR" "$OUTPUT"
+echo ""
+echo "🖨️  生成 PDF..."
+
+# Step 5: 用 Playwright 打印组合 HTML 为 PDF
+node print-to-pdf.js "$BUILD_DIR/combined.html" "$OUTPUT"
+
+echo ""
+echo "🔖 分析章节页面位置..."
+
+# Step 6: 分析章节页面位置
+node analyze-chapters.js "$BUILD_DIR/combined.html" "$BUILD_DIR/pages.json" "$BUILD_DIR/style.css"
+
+echo ""
+echo "🔖 添加书签与页码..."
+
+# Step 7: 添加 PDF 书签和页码
+python3 add-outline.py "$OUTPUT" "$BUILD_DIR/pages.json"
 
 ls -lh "$OUTPUT"
 rm -rf "$BUILD_DIR"

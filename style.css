@@ -95,5 +95,5 @@ ul, ol { padding-left: 2em; margin-bottom: 12px; }
 li + li { margin-top: .25em; }
 
 /* 每章另起一页 */
-h1 { page-break-before: always; }
-h1:first-child { page-break-before: avoid; }
+section.chapter { page-break-before: always; }
+section.chapter:first-of-type { page-break-before: avoid; }
