@@ -41,7 +41,7 @@ pre {
   background-color: #f6f8fa;
   border: 1px solid #d0d7de;
   border-radius: 6px;
-  padding: 12px;
+  padding: 8px;
   margin: 0 0 16px;
   overflow-x: auto;
   line-height: 1.45;
@@ -49,14 +49,23 @@ pre {
   white-space: pre;
   word-wrap: normal;
   tab-size: 4;
+  text-indent: 0;
 }
 
 pre code {
   background: none;
   padding: 0;
+  margin: 0;
   font-size: 0.85em;
   text-align: left;
   white-space: pre;
+  text-indent: 0;
+}
+
+/* Pandoc 默认包裹代码块的容器，必须去边距 */
+div.sourceCode {
+  margin: 0;
+  padding: 0;
 }
 
 table {

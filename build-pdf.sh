@@ -13,7 +13,7 @@ mkdir -p "$BUILD_DIR"
 cp style.css "$BUILD_DIR/"
 cp -r images "$BUILD_DIR/images"
 
-PANDOC_OPTS="--from=markdown+smart --to=html5 --standalone --css=style.css"
+PANDOC_OPTS="--from=markdown+smart --to=html5 --standalone --no-highlight --css=style.css"
 
 echo "📖 生成 README..."
 

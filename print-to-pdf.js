@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 
-const HEADER = '上手 Skill —— Agent Skill 设计、实战与评估全指南';
+const HEADER = '上手 Skill —— Agent Skill 设计、实战与评估全指南 | github.com/liuchunming033/hands-on-Skill';
 
 (async () => {
   const input = path.resolve(process.argv[2]);
