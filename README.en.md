@@ -94,11 +94,11 @@ The AI era rewards **builders who actually build**. If you just want the format 
 
 | # | Pattern | Chapter (Chinese) | Problem It Solves |
 |---|---------|-------------------|-------------------|
-| 07 | **ToolWrapper** | [ToolWrapper Pattern](./07-ToolWrapper%20模式——按需注入知识.md) | Inject domain knowledge on demand; avoid context overload |
-| 08 | **Generator** | [Generator Pattern](./08-Generator%20模式——固定输出结构.md) | Template-driven output; eliminate format instability |
-| 09 | **Reviewer** | [Reviewer Pattern](./09-Reviewer%20模式——分离审查与检查规则.md) | Decouple review flow from review rules; flexible quality checks |
-| 10 | **Inversion** | [Inversion Pattern](./10-Inversion%20模式——先问清需求再开工.md) | Ask questions first; prevent the Agent from guessing |
-| 11 | **Pipeline** | [Pipeline Pattern](./11-Pipeline%20模式——分步执行流程.md) | Gate mechanism; prevent step-skipping in multi-step workflows |
+| 07 | **ToolWrapper** | [ToolWrapper Pattern](./chapters/07-ToolWrapper%20模式——按需注入知识.md) | Inject domain knowledge on demand; avoid context overload |
+| 08 | **Generator** | [Generator Pattern](./chapters/08-Generator%20模式——固定输出结构.md) | Template-driven output; eliminate format instability |
+| 09 | **Reviewer** | [Reviewer Pattern](./chapters/09-Reviewer%20模式——分离审查与检查规则.md) | Decouple review flow from review rules; flexible quality checks |
+| 10 | **Inversion** | [Inversion Pattern](./chapters/10-Inversion%20模式——先问清需求再开工.md) | Ask questions first; prevent the Agent from guessing |
+| 11 | **Pipeline** | [Pipeline Pattern](./chapters/11-Pipeline%20模式——分步执行流程.md) | Gate mechanism; prevent step-skipping in multi-step workflows |
 
 > **Pattern selection and composition guidance is included in Chapter 11.**
 
