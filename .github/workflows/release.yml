@@ -15,8 +15,10 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq pandoc texlive-luatex texlive-lang-chinese texlive-latex-recommended texlive-latex-extra lmodern fonts-noto-color-emoji
+          sudo apt-get install -y -qq pandoc
           pip install pypdf
+          npm install
+          npx playwright install --with-deps chromium
 
       - name: Build PDF
         run: |

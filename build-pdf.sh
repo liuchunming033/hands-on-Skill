@@ -9,21 +9,24 @@ TODAY=$(date +%Y-%m-%d)
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
-PANDOC_OPTS="--pdf-engine=lualatex --from=markdown+smart --listings -H .pandoc-headers.tex -V colorlinks=true -V linkcolor=blue"
-CTEX_OPTS="-V documentclass=ctexart -V geometry:a4paper,margin=2.5cm -V fontsize:11pt"
+# 复制静态资源到构建目录
+cp style.css "$BUILD_DIR/"
+cp -r images "$BUILD_DIR/images"
+
+PANDOC_OPTS="--from=markdown+smart --to=html5 --standalone --css=style.css --metadata date=$TODAY"
 
 echo "📖 生成 README..."
 
-# 去掉标题行和语言切换行，添加课程介绍标记
+# 去掉标题行和语言切换行
 tail -n +4 README.md > "$BUILD_DIR/README-tmp.md"
 
 pandoc "$BUILD_DIR/README-tmp.md" \
   $PANDOC_OPTS \
-  $CTEX_OPTS \
   --metadata title="上手 Skill" \
-  --metadata date="$TODAY" \
-  -o "$BUILD_DIR/000-README.pdf"
+  -o "$BUILD_DIR/000-README.html"
 rm "$BUILD_DIR/README-tmp.md"
+
+node print-to-pdf.js "$BUILD_DIR/000-README.html" "$BUILD_DIR/000-README.pdf"
 
 echo "  ✓ README"
 
@@ -69,14 +72,17 @@ for f in \
   if [ -f "$file" ]; then
     basename=$(basename "$file" .md)
     title=$(echo "$basename" | sed 's/^[0-9]\{2\}-//')
+    html_name=$(printf '%03d' $INDEX)-chapter.html
     pdf_name=$(printf '%03d' $INDEX)-chapter.pdf
     echo "  📄 $title"
 
-    pandoc "$file" \
+    # 调整图片路径：chapters/ 下的文件引用 ../images/ → images/
+    sed 's|(../images/|(images/|g' "$file" | pandoc \
       $PANDOC_OPTS \
-      $CTEX_OPTS \
       --metadata title="$title" \
-      -o "$BUILD_DIR/$pdf_name"
+      -o "$BUILD_DIR/$html_name"
+
+    node print-to-pdf.js "$BUILD_DIR/$html_name" "$BUILD_DIR/$pdf_name"
 
     INDEX=$((INDEX + 1))
   fi
