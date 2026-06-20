@@ -5,6 +5,8 @@
  * 输出 pages.json: { "ch00": 5, "ch01": 8, ... }
  * 输出 links.json: [ { targetId, targetPage, sourcePage, x, y, w, h }, ... ]
  *   - x, y, w, h 是 CSS 像素坐标，相对于 body 左上角
+ *
+ * 注意：封面已独立打印为 cover.pdf，此脚本只分析正文 HTML（无封面 div）。
  */
 const { chromium } = require('playwright');
 const path = require('path');
@@ -33,7 +35,7 @@ const CONTENT_HEIGHT = Math.round(257 * 96 / 25.4);  // ~971px
   await page.setViewportSize({ width: CONTENT_WIDTH, height: 900 });
   await page.goto('file://' + input, { waitUntil: 'networkidle' });
 
-  // 获取所有章节 section 的位置、封面高度、以及链接坐标
+  // 获取所有章节 section 的位置、以及链接坐标
   const allData = await page.evaluate((pageContentHeight) => {
     const sections = document.querySelectorAll('section.chapter');
     const bodyRect = document.body.getBoundingClientRect();
@@ -50,22 +52,14 @@ const CONTENT_HEIGHT = Math.round(257 * 96 / 25.4);  // ~971px
       });
     }
 
-    // ---- 封面数据 ----
-    let coverHeight = 0;
-    let coverPages = 0;
-    const coverDiv = document.querySelector('.cover-page');
-    if (coverDiv) {
-      coverHeight = coverDiv.getBoundingClientRect().height;
-      coverPages = Math.max(1, Math.ceil(coverHeight / pageContentHeight));
-    }
-
-    // ---- 章节页码计算 ----
+    // ---- 章节页码计算（无封面，从正文第 1 页开始） ----
     let currentPage = 1;
     const pages = {};
     if (chapterResult.length > 0) {
-      const readmeHeight = chapterResult[0].docTop - coverHeight;
+      const readmeHeight = chapterResult[0].docTop;
       const readmePages = Math.ceil(readmeHeight / pageContentHeight);
-      currentPage = coverPages + readmePages + 1;
+      // section.chapter 有 page-break-before: always → 第一个 section 另起一页
+      currentPage = readmePages + 1;
     }
     for (const ch of chapterResult) {
       pages[ch.id] = currentPage;
@@ -77,25 +71,17 @@ const CONTENT_HEIGHT = Math.round(257 * 96 / 25.4);  // ~971px
     const links = [];
     const linkElements = document.querySelectorAll('a[href^="#ch"], a[href^="#appendix"]');
     for (const el of linkElements) {
-      const href = el.getAttribute('href'); // e.g. "#ch00"
+      const href = el.getAttribute('href');
       if (!href || href === '#') continue;
-      const targetId = href.substring(1); // e.g. "ch00"
+      const targetId = href.substring(1);
       const targetPage = pages[targetId];
       if (!targetPage) continue;
 
       const rect = el.getBoundingClientRect();
       const absY = rect.top - bodyRect.top;
 
-      // 判断链接所在 PDF 页码
-      let linkPage;
-      if (absY < coverHeight) {
-        // 链接在封面区域（基本不会发生）
-        linkPage = Math.ceil(absY / pageContentHeight) || 1;
-      } else {
-        // 链接在 README 区域
-        const readmeOffset = absY - coverHeight;
-        linkPage = coverPages + 1 + Math.floor(readmeOffset / pageContentHeight);
-      }
+      // 链接所在 PDF 页码（正文内部，无封面）
+      const linkPage = 1 + Math.floor(absY / pageContentHeight);
 
       links.push({
         targetId: targetId,
@@ -110,8 +96,6 @@ const CONTENT_HEIGHT = Math.round(257 * 96 / 25.4);  // ~971px
 
     return {
       pages: pages,
-      coverHeight: coverHeight,
-      coverPages: coverPages,
       pageContentHeight: pageContentHeight,
       links: links,
     };
@@ -123,15 +107,12 @@ const CONTENT_HEIGHT = Math.round(257 * 96 / 25.4);  // ~971px
   fs.writeFileSync(outputPages, JSON.stringify(allData.pages, null, 2));
   console.log(`  ✓ 章节页面映射已保存到 ${path.basename(outputPages)}`);
   for (const [id, pg] of Object.entries(allData.pages)) {
-    console.log(`    ${id}: 第 ${pg} 页`);
+    console.log(`    ${id}: 第 ${pg} 页（正文内）`);
   }
 
   // 写入链接数据
   if (outputLinks) {
-    // 附加上下文数据用于坐标转换
     const linksData = {
-      coverHeight: allData.coverHeight,
-      coverPages: allData.coverPages,
       pageContentHeight: allData.pageContentHeight,
       links: allData.links,
     };

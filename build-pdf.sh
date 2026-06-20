@@ -38,7 +38,7 @@ with open('$BUILD_DIR/README-body.html', 'w') as f:
     f.write(html)
 "
 
-# Step 3: 初始化组合 HTML，写入头部和 README body
+# Step 3: 初始化组合 HTML，写入头部（无封面 div，封面单独打印）
 cat > "$BUILD_DIR/combined.html" << 'HEADER_EOF'
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -48,9 +48,6 @@ cat > "$BUILD_DIR/combined.html" << 'HEADER_EOF'
 </head>
 <body>
 HEADER_EOF
-
-# 追加封面图片（第一页）
-echo '<div class="cover-page"><img src="images/cover.png" alt="封面"></div>' >> "$BUILD_DIR/combined.html"
 
 # 追加 PDF 标题 + README body
 echo '<h1>上手Skill / Hands on Skill</h1>' >> "$BUILD_DIR/combined.html"
@@ -101,12 +98,10 @@ for f in \
 
     # 生成章节 ID
     if [[ "$f" == appendices/* ]]; then
-      # 附录: 提取数字 → appendix1, appendix2, ...
       appendix_num=$(echo "$basename" | grep -oE '^附录([0-9]+)' | grep -oE '[0-9]+')
       section_id="appendix${appendix_num}"
       chapter_title="$basename"
     else
-      # 章节: 提取数字 → ch00, ch01, ch02, ...
       chapter_num=$(echo "$basename" | grep -oE '^[0-9]+')
       section_id="ch${chapter_num}"
       chapter_title="$basename"
@@ -133,20 +128,23 @@ echo "</html>" >> "$BUILD_DIR/combined.html"
 echo ""
 echo "🖨️  生成 PDF..."
 
-# Step 5: 用 Playwright 打印组合 HTML 为 PDF
-node print-to-pdf.js "$BUILD_DIR/combined.html" "$OUTPUT"
+# Step 5: 打印封面 PDF（cover.html，无边距）
+node print-cover.js "images/cover.html" "$BUILD_DIR/cover.pdf"
+
+# Step 6: 打印正文 PDF（combined.html）
+node print-to-pdf.js "$BUILD_DIR/combined.html" "$BUILD_DIR/body.pdf"
 
 echo ""
 echo "🔖 分析章节页面位置..."
 
-# Step 6: 分析章节页面位置 + 捕获目录链接坐标
+# Step 7: 分析正文 HTML 的章节页面 + 捕获目录链接坐标
 node analyze-chapters.js "$BUILD_DIR/combined.html" "$BUILD_DIR/pages.json" "$BUILD_DIR/links.json"
 
 echo ""
-echo "🔖 添加书签、页码与内链跳转..."
+echo "🔖 合并 PDF、添加书签、页码与内链跳转..."
 
-# Step 7: 添加 PDF 书签、页码和内链跳转
-python3 add-outline.py "$OUTPUT" "$BUILD_DIR/pages.json" "$BUILD_DIR/links.json"
+# Step 8: 合并封面+正文 PDF，添加书签、页码
+python3 add-outline.py "$BUILD_DIR/body.pdf" "$BUILD_DIR/pages.json" "$BUILD_DIR/cover.pdf" "$OUTPUT"
 
 ls -lh "$OUTPUT"
 rm -rf "$BUILD_DIR"

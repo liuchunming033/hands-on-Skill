@@ -1,35 +1,20 @@
 """
-为 PDF 添加书签导航、页码和内链跳转。
-用法: python3 add-outline.py <input.pdf> <pages.json> [links.json]
+合并封面与正文 PDF，添加书签导航、页码和内链跳转。
+用法: python3 add-outline.py <body.pdf> <pages.json> <links.json> <cover.pdf> <output.pdf>
 """
 import sys, io, json
 from pypdf import PdfReader, PdfWriter, Transformation
-from pypdf.annotations import Link
-from pypdf.generic import Fit
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-pdf_path = sys.argv[1]
+body_pdf_path = sys.argv[1]
 pages_json_path = sys.argv[2]
-links_json_path = sys.argv[3] if len(sys.argv) > 3 else None
+cover_pdf_path = sys.argv[3] if len(sys.argv) > 3 else None
+output_pdf_path = sys.argv[4] if len(sys.argv) > 4 else body_pdf_path
 
 # ---- PDF 坐标常量 ----
-# A4: 595.28 x 841.89 pt
-# margin: top 1.5cm=42.52pt, bottom 2.5cm=70.87pt, left 2.5cm=70.87pt, right 2.5cm=70.87pt
 PAGE_W = 595.28
 PAGE_H = 841.89
-MARGIN_TOP = 42.52
-MARGIN_BOTTOM = 70.87
-MARGIN_LEFT = 70.87
-CONTENT_W_PT = PAGE_W - 2 * MARGIN_LEFT   # 453.54pt
-CONTENT_H_PT = PAGE_H - MARGIN_TOP - MARGIN_BOTTOM  # 728.50pt
-
-# 浏览器 viewport 常量（与 analyze-chapters.js 一致）
-CONTENT_W_PX = 605   # px
-CONTENT_H_PX = 971   # px
-
-SCALE_X = CONTENT_W_PT / CONTENT_W_PX   # ~0.74965
-SCALE_Y = CONTENT_H_PT / CONTENT_H_PX   # ~0.75026
 
 # ---- 章节标题映射 ----
 CHAPTER_TITLES = {
@@ -71,23 +56,29 @@ CHAPTER_TITLES = {
 
 # ---- 读取数据 ----
 with open(pages_json_path) as f:
-    chapter_pages = json.load(f)
+    chapter_pages = json.load(f)  # 1-based, 正文内部页码
 
-reader = PdfReader(pdf_path)
-total_pages = len(reader.pages)
+# ---- 合并 PDF ----
 writer = PdfWriter()
+cover_page_count = 0
 
-for page in reader.pages:
+if cover_pdf_path:
+    cover_reader = PdfReader(cover_pdf_path)
+    for page in cover_reader.pages:
+        writer.add_page(page)
+    cover_page_count = len(cover_reader.pages)
+    print(f"  ✓ 合并封面: {cover_page_count} 页")
+
+body_reader = PdfReader(body_pdf_path)
+body_page_count = len(body_reader.pages)
+for page in body_reader.pages:
     writer.add_page(page)
+print(f"  ✓ 合并正文: {body_page_count} 页")
 
-# ---- 读取链接数据 ----
-links_data = None
-if links_json_path:
-    with open(links_json_path) as f:
-        links_data = json.load(f)
+total_pages = cover_page_count + body_page_count
 
-cover_height = links_data.get("coverHeight", 0) if links_data else 0
-cover_pages = links_data.get("coverPages", 1) if links_data else 1
+# 封面偏移量：正文页码 → 合并后页码的偏移
+PAGE_OFFSET = cover_page_count  # 1（封面占 1 页）
 
 # ---- 添加书签导航 ----
 outline_items = []
@@ -101,62 +92,33 @@ for ch_id, ch_page in sorted(chapter_pages.items(), key=lambda x: x[1]):
         numbered_title = f"{num} {title}"
     else:
         numbered_title = title
-    outline_items.append((ch_page, numbered_title))
+    # 正文页码 + 封面偏移 = 合并后页码
+    outline_items.append((ch_page + PAGE_OFFSET, numbered_title))
 
 for ch_page, title in outline_items:
-    page_offset = ch_page - 1
+    page_offset = ch_page - 1  # 0-based
     if page_offset < total_pages:
         writer.add_outline_item(title, page_offset, parent=None)
         print(f"  ✓ 书签: [{ch_page}] {title}")
 
-# ---- 注册命名目标（为内链跳转提供目标） ----
+# ---- 注册命名目标 ----
+# Chromium 已将 HTML <a href="#chXX"> 转为 PDF 命名目标链接，
+# 注册命名目标使这些链接在合并后的 PDF 中正确跳转。
 print("  ✓ 注册命名目标...")
 for ch_id, ch_page in chapter_pages.items():
-    writer.add_named_destination(ch_id, ch_page - 1)  # 0-based
-
-# ---- 添加目录内链跳转 ----
-if links_data:
-    link_count = 0
-    for link in links_data.get("links", []):
-        source_page = link["sourcePage"] - 1  # 0-based
-        target_page = link["targetPage"] - 1   # 0-based
-
-        if source_page < 0 or source_page >= total_pages:
-            continue
-        if target_page < 0 or target_page >= total_pages:
-            continue
-
-        x = link["x"]
-        y = link["y"]
-        w = link["w"]
-        h = link["h"]
-
-        # 计算链接在 PDF 内容区域中的 Y 偏移（px）
-        content_y = (y - cover_height) % CONTENT_H_PX
-
-        # 转换为 PDF 坐标
-        pdf_x1 = MARGIN_LEFT + x * SCALE_X
-        pdf_x2 = MARGIN_LEFT + (x + w) * SCALE_X
-        pdf_y_top = PAGE_H - MARGIN_TOP - content_y * SCALE_Y
-        pdf_y_bottom = PAGE_H - MARGIN_TOP - (content_y + h) * SCALE_Y
-
-        annotation = Link(
-            rect=(pdf_x1, pdf_y_bottom, pdf_x2, pdf_y_top),
-            target_page_index=target_page,
-            fit=Fit(fit_type="/XYZ"),
-        )
-        writer.add_annotation(page_number=source_page, annotation=annotation)
-        link_count += 1
-
-    print(f"  ✓ 内链: 共 {link_count} 个跳转链接")
+    writer.add_named_destination(ch_id, ch_page - 1 + PAGE_OFFSET)
+    print(f"    {ch_id} → 第 {ch_page + PAGE_OFFSET} 页")
 
 # ---- 添加页码 ----
-ch00_page = chapter_pages.get("ch00")
-if ch00_page is None:
-    ch00_page = min(chapter_pages.values()) if chapter_pages else 1
+ch00_body_page = chapter_pages.get("ch00")
+if ch00_body_page is None:
+    ch00_body_page = min(chapter_pages.values()) if chapter_pages else 1
 
-for page_num in range(ch00_page - 1, total_pages):
-    display_num = page_num - (ch00_page - 1) + 1
+# ch00 在合并后 PDF 中的页码（1-based）
+ch00_merged_page = ch00_body_page + PAGE_OFFSET
+
+for page_num in range(ch00_merged_page - 1, total_pages):
+    display_num = page_num - (ch00_merged_page - 1) + 1
 
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=(40, 16))
@@ -174,7 +136,7 @@ for page_num in range(ch00_page - 1, total_pages):
         print(f"    页码已添加至第 {display_num} 页")
 
 # ---- 写入输出 ----
-with open(pdf_path, 'wb') as f:
+with open(output_pdf_path, 'wb') as f:
     writer.write(f)
 
-print(f"✅ 共 {len(chapter_pages)} 个书签，页码从 ch00（第 {ch00_page} 页）开始，总计 {total_pages} 页")
+print(f"✅ 共 {len(chapter_pages)} 个书签，页码从 ch00（第 {ch00_merged_page} 页）开始，总计 {total_pages} 页")
