@@ -17,7 +17,7 @@ documentclass: ctexart
 geometry: "a4paper, margin=2.5cm"
 fontsize: 11pt
 toc: true
-toc-depth: 2
+toc-depth: 1
 numbersections: true
 ---
 
@@ -74,6 +74,12 @@ for f in \
 ; do
   file="${f}.md"
   if [ -f "$file" ]; then
+    # 提取文件名作为章节标题
+    basename="${f##*/}"
+    echo "" >> "$TMP_MD"
+    echo "\\newpage" >> "$TMP_MD"
+    echo "" >> "$TMP_MD"
+    echo "# $basename" >> "$TMP_MD"
     echo "" >> "$TMP_MD"
     cat "$file" >> "$TMP_MD"
     echo "" >> "$TMP_MD"
@@ -83,8 +89,8 @@ for f in \
   fi
 done
 
-# 清理 Obsidian 图片语法残留 (转义 [[ 为 ![])
-sed -i '' 's/!\[\[\([^]]*\)\]\]/![](\1)/g' "$TMP_MD" 2>/dev/null || sed -i 's/!\[\[\([^]]*\)\]\]/![](\1)/g' "$TMP_MD"
+# 修复图片路径: ../images/ → images/ (合并后从根目录引用)
+sed -i '' 's|](../images/|](images/|g' "$TMP_MD" 2>/dev/null || sed -i 's|](../images/|](images/|g' "$TMP_MD"
 
 echo ""
 echo "📄 生成 PDF: $OUTPUT"
@@ -92,7 +98,7 @@ echo "📄 生成 PDF: $OUTPUT"
 pandoc "$TMP_MD" \
   --pdf-engine=xelatex \
   --from=markdown+smart \
-  --toc --toc-depth=2 \
+  --toc --toc-depth=1 \
   --number-sections \
   --highlight-style=tango \
   -V colorlinks=true \
