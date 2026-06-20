@@ -1,8 +1,10 @@
 /**
- * 分析组合 HTML 中各章节的页面位置。
- * 用法: node analyze-chapters.js <combined.html> <pages.json> [style.css]
+ * 分析组合 HTML 中各章节的页面位置，并捕获目录链接坐标。
+ * 用法: node analyze-chapters.js <combined.html> <pages.json> <links.json>
  *
- * 输出 JSON: { "ch00": 5, "ch01": 8, ... }
+ * 输出 pages.json: { "ch00": 5, "ch01": 8, ... }
+ * 输出 links.json: [ { targetId, targetPage, sourcePage, x, y, w, h }, ... ]
+ *   - x, y, w, h 是 CSS 像素坐标，相对于 body 左上角
  */
 const { chromium } = require('playwright');
 const path = require('path');
@@ -16,7 +18,8 @@ const CONTENT_HEIGHT = Math.round(257 * 96 / 25.4);  // ~971px
 
 (async () => {
   const input = path.resolve(process.argv[2]);
-  const output = path.resolve(process.argv[3]);
+  const outputPages = path.resolve(process.argv[3]);
+  const outputLinks = process.argv[4] ? path.resolve(process.argv[4]) : null;
 
   if (!fs.existsSync(input)) {
     console.error(`❌ 文件不存在: ${input}`);
@@ -30,51 +33,110 @@ const CONTENT_HEIGHT = Math.round(257 * 96 / 25.4);  // ~971px
   await page.setViewportSize({ width: CONTENT_WIDTH, height: 900 });
   await page.goto('file://' + input, { waitUntil: 'networkidle' });
 
-  // 获取所有章节 section 的位置和高度
-  const chapterData = await page.evaluate((pageContentHeight) => {
+  // 获取所有章节 section 的位置、封面高度、以及链接坐标
+  const allData = await page.evaluate((pageContentHeight) => {
     const sections = document.querySelectorAll('section.chapter');
     const bodyRect = document.body.getBoundingClientRect();
 
-    const result = [];
-    let lastBottom = bodyRect.top; // 文档顶部
-
+    // ---- 章节数据 ----
+    const chapterResult = [];
     for (const section of sections) {
       const rect = section.getBoundingClientRect();
-      // 相对于文档顶部的 Y 位置
       const docTop = rect.top - bodyRect.top;
-      result.push({
+      chapterResult.push({
         id: section.id,
         docTop: docTop,
         height: rect.height,
       });
     }
 
-    // 模拟 PDF 分页（page-break-before: always 强制每个 section 另起一页）
-    let currentPage = 1;
-    const pages = {};
-
-    // 第一个 section 之前的内容（README）所占页数
-    if (result.length > 0) {
-      const readmeHeight = result[0].docTop;
-      const readmePages = Math.ceil(readmeHeight / pageContentHeight);
-      // 由于 section.chapter 有 page-break-before: always，第一个 section 另起一页
-      currentPage = readmePages + 1;
+    // ---- 封面数据 ----
+    let coverHeight = 0;
+    let coverPages = 0;
+    const coverDiv = document.querySelector('.cover-page');
+    if (coverDiv) {
+      coverHeight = coverDiv.getBoundingClientRect().height;
+      coverPages = Math.max(1, Math.ceil(coverHeight / pageContentHeight));
     }
 
-    for (const ch of result) {
+    // ---- 章节页码计算 ----
+    let currentPage = 1;
+    const pages = {};
+    if (chapterResult.length > 0) {
+      const readmeHeight = chapterResult[0].docTop - coverHeight;
+      const readmePages = Math.ceil(readmeHeight / pageContentHeight);
+      currentPage = coverPages + readmePages + 1;
+    }
+    for (const ch of chapterResult) {
       pages[ch.id] = currentPage;
       const sectionPages = Math.ceil(ch.height / pageContentHeight);
       currentPage += sectionPages;
     }
 
-    return pages;
+    // ---- 捕获链接坐标 ----
+    const links = [];
+    const linkElements = document.querySelectorAll('a[href^="#ch"], a[href^="#appendix"]');
+    for (const el of linkElements) {
+      const href = el.getAttribute('href'); // e.g. "#ch00"
+      if (!href || href === '#') continue;
+      const targetId = href.substring(1); // e.g. "ch00"
+      const targetPage = pages[targetId];
+      if (!targetPage) continue;
+
+      const rect = el.getBoundingClientRect();
+      const absY = rect.top - bodyRect.top;
+
+      // 判断链接所在 PDF 页码
+      let linkPage;
+      if (absY < coverHeight) {
+        // 链接在封面区域（基本不会发生）
+        linkPage = Math.ceil(absY / pageContentHeight) || 1;
+      } else {
+        // 链接在 README 区域
+        const readmeOffset = absY - coverHeight;
+        linkPage = coverPages + 1 + Math.floor(readmeOffset / pageContentHeight);
+      }
+
+      links.push({
+        targetId: targetId,
+        targetPage: targetPage,
+        sourcePage: linkPage,
+        x: rect.left - bodyRect.left,
+        y: absY,
+        w: rect.width,
+        h: rect.height,
+      });
+    }
+
+    return {
+      pages: pages,
+      coverHeight: coverHeight,
+      coverPages: coverPages,
+      pageContentHeight: pageContentHeight,
+      links: links,
+    };
   }, CONTENT_HEIGHT);
 
   await browser.close();
 
-  fs.writeFileSync(output, JSON.stringify(chapterData, null, 2));
-  console.log(`  ✓ 章节页面映射已保存到 ${path.basename(output)}`);
-  for (const [id, page] of Object.entries(chapterData)) {
-    console.log(`    ${id}: 第 ${page} 页`);
+  // 写入章节页面映射
+  fs.writeFileSync(outputPages, JSON.stringify(allData.pages, null, 2));
+  console.log(`  ✓ 章节页面映射已保存到 ${path.basename(outputPages)}`);
+  for (const [id, pg] of Object.entries(allData.pages)) {
+    console.log(`    ${id}: 第 ${pg} 页`);
+  }
+
+  // 写入链接数据
+  if (outputLinks) {
+    // 附加上下文数据用于坐标转换
+    const linksData = {
+      coverHeight: allData.coverHeight,
+      coverPages: allData.coverPages,
+      pageContentHeight: allData.pageContentHeight,
+      links: allData.links,
+    };
+    fs.writeFileSync(outputLinks, JSON.stringify(linksData, null, 2));
+    console.log(`  ✓ 链接坐标已保存到 ${path.basename(outputLinks)}`);
+    console.log(`    共 ${allData.links.length} 个可点击链接`);
   }
 })();

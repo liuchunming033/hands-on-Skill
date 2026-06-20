@@ -94,5 +94,17 @@ hr { border: 0; border-top: 1px solid #d0d7de; margin: 24px 0; }
 ul, ol { padding-left: 2em; margin-bottom: 12px; }
 li + li { margin-top: .25em; }
 
+/* 封面页 */
+.cover-page {
+  page-break-after: always;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+.cover-page img {
+  width: 100%;
+  height: auto;
+}
+
 /* 每章另起一页 */
 section.chapter { page-break-before: always; }

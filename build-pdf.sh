@@ -49,7 +49,10 @@ cat > "$BUILD_DIR/combined.html" << 'HEADER_EOF'
 <body>
 HEADER_EOF
 
-# 追加 PDF 封面标题 + README body
+# 追加封面图片（第一页）
+echo '<div class="cover-page"><img src="images/cover.png" alt="封面"></div>' >> "$BUILD_DIR/combined.html"
+
+# 追加 PDF 标题 + README body
 echo '<h1>上手Skill / Hands on Skill</h1>' >> "$BUILD_DIR/combined.html"
 cat "$BUILD_DIR/README-body.html" >> "$BUILD_DIR/combined.html"
 rm "$BUILD_DIR/README-body.html"
@@ -136,14 +139,14 @@ node print-to-pdf.js "$BUILD_DIR/combined.html" "$OUTPUT"
 echo ""
 echo "🔖 分析章节页面位置..."
 
-# Step 6: 分析章节页面位置
-node analyze-chapters.js "$BUILD_DIR/combined.html" "$BUILD_DIR/pages.json" "$BUILD_DIR/style.css"
+# Step 6: 分析章节页面位置 + 捕获目录链接坐标
+node analyze-chapters.js "$BUILD_DIR/combined.html" "$BUILD_DIR/pages.json" "$BUILD_DIR/links.json"
 
 echo ""
-echo "🔖 添加书签与页码..."
+echo "🔖 添加书签、页码与内链跳转..."
 
-# Step 7: 添加 PDF 书签和页码
-python3 add-outline.py "$OUTPUT" "$BUILD_DIR/pages.json"
+# Step 7: 添加 PDF 书签、页码和内链跳转
+python3 add-outline.py "$OUTPUT" "$BUILD_DIR/pages.json" "$BUILD_DIR/links.json"
 
 ls -lh "$OUTPUT"
 rm -rf "$BUILD_DIR"
