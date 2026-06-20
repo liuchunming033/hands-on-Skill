@@ -9,7 +9,7 @@ TODAY=$(date +%Y-%m-%d)
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
-PANDOC_OPTS="--pdf-engine=xelatex --from=markdown+smart --listings -H .listings-setup.tex -V colorlinks=true -V linkcolor=blue"
+PANDOC_OPTS="--pdf-engine=lualatex --from=markdown+smart --listings -H .pandoc-headers.tex -V colorlinks=true -V linkcolor=blue"
 CTEX_OPTS="-V documentclass=ctexart -V geometry:a4paper,margin=2.5cm -V fontsize:11pt"
 
 echo "📖 生成 README..."
