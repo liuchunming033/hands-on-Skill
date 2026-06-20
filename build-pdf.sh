@@ -3,43 +3,32 @@ set -e
 
 VERSION="${1:-dev}"
 OUTPUT="hands-on-skill-${VERSION}.pdf"
-TMP_MD=".tmp-merged.md"
+BUILD_DIR=".build-pdf"
 TODAY=$(date +%Y-%m-%d)
 
-echo "📖 合并章节..."
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
 
-# 生成合并文件头部
-cat > "$TMP_MD" << TITLEEOF
----
-title: "上手 Skill —— Agent Skill 设计、实战与评估全指南"
-author: "liuchunming"
-date: "$TODAY"
-documentclass: ctexart
-geometry: "a4paper, margin=2.5cm"
-fontsize: 11pt
-toc: true
-toc-depth: 1
-numbersections: true
----
+PANDOC_OPTS="--pdf-engine=xelatex --from=markdown+smart --highlight-style=tango -V colorlinks=true -V linkcolor=blue"
+CTEX_OPTS="-V documentclass=ctexart -V geometry:a4paper,margin=2.5cm -V fontsize:11pt"
 
-\newpage
+echo "📖 生成 README..."
 
-# 课程介绍 {.unnumbered}
+# 去掉标题行和语言切换行，添加课程介绍标记
+tail -n +4 README.md > "$BUILD_DIR/README-tmp.md"
 
-TITLEEOF
+pandoc "$BUILD_DIR/README-tmp.md" \
+  $PANDOC_OPTS \
+  $CTEX_OPTS \
+  --metadata title="上手 Skill" \
+  --metadata date="$TODAY" \
+  -o "$BUILD_DIR/000-README.pdf"
+rm "$BUILD_DIR/README-tmp.md"
 
-# 引入 README.md 作为课程介绍（跳过标题和语言切换行）
-tail -n +4 README.md >> "$TMP_MD"
+echo "  ✓ README"
 
-cat >> "$TMP_MD" << PAGEEOF
-
-\newpage
-
-\pagenumbering{arabic}
-
-PAGEEOF
-
-# 按课程顺序合并正文章节
+# 按课程顺序逐章生成 PDF
+INDEX=1
 for f in \
   "chapters/00-导言——Agent架构全景：四大组件定位" \
   "chapters/01-为什么要学 Skill？—— 通用智能体的最后一公里" \
@@ -78,39 +67,26 @@ for f in \
 ; do
   file="${f}.md"
   if [ -f "$file" ]; then
-    # 提取文件名并去掉数字前缀作为章节标题
-    basename="${f##*/}"
-    # 去掉 "00-"-"27-" 数字前缀，附录前缀保留
+    basename=$(basename "$file" .md)
     title=$(echo "$basename" | sed 's/^[0-9]\{2\}-//')
-    echo "" >> "$TMP_MD"
-    echo "\\newpage" >> "$TMP_MD"
-    echo "" >> "$TMP_MD"
-    echo "# $title" >> "$TMP_MD"
-    echo "" >> "$TMP_MD"
-    cat "$file" >> "$TMP_MD"
-    echo "" >> "$TMP_MD"
-    echo "  ✓ ${f}"
-  else
-    echo "  ✗ 跳过: $file (不存在)"
+    pdf_name=$(printf '%03d' $INDEX)-chapter.pdf
+    echo "  📄 $title"
+
+    pandoc "$file" \
+      $PANDOC_OPTS \
+      $CTEX_OPTS \
+      --metadata title="$title" \
+      -o "$BUILD_DIR/$pdf_name"
+
+    INDEX=$((INDEX + 1))
   fi
 done
 
-# 修复图片路径: ../images/ → images/ (合并后从根目录引用)
-sed -i '' 's|](../images/|](images/|g' "$TMP_MD" 2>/dev/null || sed -i 's|](../images/|](images/|g' "$TMP_MD"
-
 echo ""
-echo "📄 生成 PDF: $OUTPUT"
+echo "🔗 拼接 PDF + 写书签..."
 
-pandoc "$TMP_MD" \
-  --pdf-engine=xelatex \
-  --from=markdown+smart \
-  --toc --toc-depth=1 \
-  --number-sections \
-  --highlight-style=tango \
-  -V colorlinks=true \
-  -V linkcolor=blue \
-  -o "$OUTPUT"
+python3 merge.py "$BUILD_DIR" "$OUTPUT"
 
 ls -lh "$OUTPUT"
-rm "$TMP_MD"
+rm -rf "$BUILD_DIR"
 echo "✅ 完成: $OUTPUT"
