@@ -45,10 +45,16 @@ CHAPTER_SEARCH = build_search_list()
 print(f"  ✓ 从目录扫描到 {len(CHAPTER_SEARCH)} 个章节")
 
 # 用 pdftotext 提取所有文本（form feed \f 分隔页面）
-result = subprocess.run(
-    ["pdftotext", body_pdf_path, "-"],
-    capture_output=True, text=True
-)
+try:
+    result = subprocess.run(
+        ["pdftotext", body_pdf_path, "-"],
+        capture_output=True, text=True
+    )
+except FileNotFoundError:
+    print("❌ 未找到 pdftotext。请安装 poppler-utils：")
+    print("   macOS:  brew install poppler")
+    print("   Ubuntu: sudo apt-get install poppler-utils")
+    sys.exit(1)
 if result.returncode != 0:
     print(f"❌ pdftotext 失败: {result.stderr}")
     sys.exit(1)
