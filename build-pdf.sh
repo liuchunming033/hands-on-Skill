@@ -72,9 +72,11 @@ for f in \
     pdf_name=$(printf '%03d' $INDEX)-chapter.pdf
     echo "  📄 $title"
 
-    pandoc "$file" \
-      $PANDOC_OPTS \
-      $CTEX_OPTS \
+    sed '/^## 🔗 章节导航$/,$d' "$file" | pandoc \
+      --pdf-engine=xelatex --from=markdown+smart \
+      --highlight-style=tango \
+      -V colorlinks=true -V linkcolor=blue \
+      -V documentclass=ctexart -V geometry:a4paper,margin=2.5cm -V fontsize:11pt \
       --metadata title="$title" \
       -o "$BUILD_DIR/$pdf_name"
 
