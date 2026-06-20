@@ -1,11 +1,18 @@
-% 代码块长行自动换行
+% 代码块样式：浅灰背景 + 自动换行
+\usepackage{xcolor}
+\definecolor{codebg}{RGB}{245,245,245}
 \lstset{
+  backgroundcolor=\color{codebg},
   breaklines=true,
   breakatwhitespace=false,
   breakautoindent=false,
   basicstyle=\small\ttfamily,
   columns=flexible,
-  keepspaces=true
+  keepspaces=true,
+  frame=single,
+  framerule=0.3pt,
+  framesep=6pt,
+  rulecolor=\color{black!15}
 }
 
 % 支持 emoji 图标
