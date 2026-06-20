@@ -6,6 +6,8 @@ const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 
+const HEADER = '上手 Skill —— Agent Skill 设计、实战与评估全指南';
+
 (async () => {
   const input = path.resolve(process.argv[2]);
   const output = path.resolve(process.argv[3]);
@@ -21,8 +23,11 @@ const fs = require('fs');
   await page.pdf({
     path: output,
     format: 'A4',
-    margin: { top: '2.5cm', right: '2.5cm', bottom: '2.5cm', left: '2.5cm' },
-    printBackground: true
+    margin: { top: '3cm', right: '2.5cm', bottom: '2.5cm', left: '2.5cm' },
+    printBackground: true,
+    displayHeaderFooter: true,
+    headerTemplate: `<div style="font-size:9px;text-align:center;width:100%;color:#888;font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;padding-top:5px;">${HEADER}</div>`,
+    footerTemplate: '<div></div>'
   });
   await browser.close();
   console.log(`  ✓ ${path.basename(output)}`);

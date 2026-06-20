@@ -9,7 +9,7 @@ English | [简体中文](./README.md)
 
 ---
 
-## Why This Course Exists
+## Why This Guide Exists
 
 By 2025, the file format for Agent Skills had largely converged — Claude Code, Gemini CLI, and Cursor all use the same folder layout and YAML conventions. Format is no longer the barrier.
 
@@ -17,17 +17,17 @@ But here's the real fork in the road: **two SKILL.md files with identical struct
 
 I read through the raw Skill code from Anthropic, Google, OpenAI, and community open-source repositories, and noticed a recurring pattern: **great Skills aren't "a pile of instructions." They follow an implicit design language — when to load knowledge, when not to, when to ask the user, when to enforce a hard check.** That design language can be described as five universal design patterns.
 
-This course is the byproduct of a **"Learn by Doing"** process. I dissected each pattern, tested it in real scenarios, made mistakes, corrected them, and then wrote everything down using the Feynman technique — making tacit knowledge explicit, clear, and opinionated. It's not a translation of official docs. It's a record of what I learned, built, and broke along the way.
+This guide is the byproduct of a **"Learn by Doing"** process. I dissected each pattern, tested it in real scenarios, made mistakes, corrected them, and then wrote everything down using the Feynman technique — making tacit knowledge explicit, clear, and opinionated. It's not a translation of official docs. It's a record of what I learned, built, and broke along the way.
 
-This is a course that was **built**, not just compiled.
+This is a guide that was **built**, not just compiled.
 
 ---
 
-## Course Philosophy: Build in the Open, Iterate Relentlessly
+## Guide Philosophy: Build in the Open, Iterate Relentlessly
 
 ### Core Belief: Passive Learning Is Fake Learning
 
-Watching tutorials and reading docs without building is "lazy learning" — you stay in input mode forever. The iron rule of this course: **every chapter gives you something you can stop and try immediately.** You don't need all 27 chapters to write your first Skill. Two chapters are enough.
+Watching tutorials and reading docs without building is "lazy learning" — you stay in input mode forever. The iron rule of this guide: **every chapter gives you something you can stop and try immediately.** You don't need all 27 chapters to write your first Skill. Two chapters are enough.
 
 The five-part structure is a miniature personal growth loop:
 
@@ -41,9 +41,9 @@ This loop isn't theoretical. It's exactly how I learned — consume raw source m
 
 **MVP-driven.** Each chapter is ~5 minutes, delivering a 60%-complete but immediately usable mental model. Ship first, iterate on feedback — same logic as building a product. Continuous output beats one perfect masterpiece.
 
-**Get your hands dirty.** Every conclusion in this course comes from actually opening SKILL.md files, reading them line by line, running them, modifying them, and verifying the results. Not reading someone else's summary — doing the work.
+**Get your hands dirty.** Every conclusion in this guide comes from actually opening SKILL.md files, reading them line by line, running them, modifying them, and verifying the results. Not reading someone else's summary — doing the work.
 
-**Content as a byproduct of practice.** This isn't a "course project." It's the natural output of building AI workflows and exploring the boundaries of Agent capabilities. Real scar tissue is more convincing than fabricated tutorials.
+**Content as a byproduct of practice.** This isn't a "guide project." It's the natural output of building AI workflows and exploring the boundaries of Agent capabilities. Real scar tissue is more convincing than fabricated tutorials.
 
 **Open ecosystem first.** Every reference case comes from public open-source repositories (Anthropic, Google, OpenAI Codex, Superpowers, gstack, addyosmani/agent-skills). Zero dependency on proprietary paid tools. Anyone can replicate the full learning path at zero cost.
 
@@ -51,11 +51,11 @@ This loop isn't theoretical. It's exactly how I learned — consume raw source m
 
 Skill is just the vehicle. What you're really building is **a new kind of judgment**: the ability to convert fuzzy engineering experience into capability units that an Agent can execute reliably. This judgment doesn't come from memorizing format specs. It comes from curated input, hands-on building, Feynman-style output, and continuous iteration — accumulated day by day.
 
-The AI era rewards **builders who actually build**. If you just want the format spec, read the Anthropic docs. If you want the design intuition to write a *good* Skill, this course is for you.
+The AI era rewards **builders who actually build**. If you just want the format spec, read the Anthropic docs. If you want the design intuition to write a *good* Skill, this guide is for you.
 
 ---
 
-## 💡 What Makes This Course Different
+## 💡 What Makes This Guide Different
 
 1. **Real-code driven.** Every example and analysis comes from actual open-source Skill repositories.
 2. **Progressive learning.** Cognition → Design → Practice → Evaluation → Operations, step by step.
@@ -65,7 +65,7 @@ The AI era rewards **builders who actually build**. If you just want the format 
 
 ---
 
-## 📚 Course Structure (27 Chapters + Prologue + Appendices)
+## 📚 Guide Structure (27 Chapters + Prologue + Appendices)
 
 ### Prologue
 
@@ -191,7 +191,7 @@ Jump directly to the chapter that matches your pain point:
 
 ## 🔗 External References
 
-All code repositories and resources analyzed in this course:
+All code repositories and resources analyzed in this guide:
 
 - [Anthropic Agent Skills Docs](https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills)
 - [Claude Code Skills Docs](https://docs.anthropic.com/en/docs/claude-code/skills)

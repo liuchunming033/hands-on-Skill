@@ -13,7 +13,7 @@ mkdir -p "$BUILD_DIR"
 cp style.css "$BUILD_DIR/"
 cp -r images "$BUILD_DIR/images"
 
-PANDOC_OPTS="--from=markdown+smart --to=html5 --standalone --css=style.css --metadata date=$TODAY"
+PANDOC_OPTS="--from=markdown+smart --to=html5 --standalone --css=style.css"
 
 echo "📖 生成 README..."
 
@@ -23,6 +23,7 @@ tail -n +4 README.md > "$BUILD_DIR/README-tmp.md"
 pandoc "$BUILD_DIR/README-tmp.md" \
   $PANDOC_OPTS \
   --metadata title="上手 Skill" \
+  --metadata date="$TODAY" \
   -o "$BUILD_DIR/000-README.html"
 rm "$BUILD_DIR/README-tmp.md"
 
@@ -30,8 +31,9 @@ node print-to-pdf.js "$BUILD_DIR/000-README.html" "$BUILD_DIR/000-README.pdf"
 
 echo "  ✓ README"
 
-# 按课程顺序逐章生成 PDF
+# 按顺序逐章生成 PDF
 INDEX=1
+APPENDIX_NUM=0
 for f in \
   "chapters/00-导言——Agent架构全景：四大组件定位" \
   "chapters/01-为什么要学 Skill？—— 通用智能体的最后一公里" \
@@ -71,7 +73,17 @@ for f in \
   file="${f}.md"
   if [ -f "$file" ]; then
     basename=$(basename "$file" .md)
-    title=$(echo "$basename" | sed 's/^[0-9]\{2\}-//')
+
+    # 附录：编号为 附录1、附录2...
+    if [[ "$f" == appendices/* ]]; then
+      APPENDIX_NUM=$((APPENDIX_NUM + 1))
+      body="${basename#附录-}"
+      title="附录${APPENDIX_NUM}-${body}"
+    else
+      # 章节：保留文件名中的序号（如 01-、02-）
+      title="$basename"
+    fi
+
     html_name=$(printf '%03d' $INDEX)-chapter.html
     pdf_name=$(printf '%03d' $INDEX)-chapter.pdf
     echo "  📄 $title"

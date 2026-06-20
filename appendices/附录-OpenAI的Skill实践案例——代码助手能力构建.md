@@ -2,11 +2,11 @@
 
 ---
 
-> 这是本课程的参考资料，用于帮助团队从 OpenAI Codex 的真实 Skill 实践中学习领域化能力构建方法。
+> 这是本教程的参考资料，用于帮助团队从 OpenAI Codex 的真实 Skill 实践中学习领域化能力构建方法。
 >
 > **代码库地址**：https://github.com/openai/codex/tree/main/.codex/skills
 >
-> **阅读对象**：已经学完本课程前 27 章，希望参考 OpenAI 官方实践来为具体代码库构建深度领域化 Skill 的读者。
+> **阅读对象**：已经学完本教程前 27 章，希望参考 OpenAI 官方实践来为具体代码库构建深度领域化 Skill 的读者。
 
 ## 先给结论
 
@@ -87,7 +87,7 @@ Keep polling when:
 
 **为什么这很重要**：大部分 Skill 写到最后是"生成一份报告"或"审查一份代码"。babysit-pr 展示了 Skill 的另一种可能：**持续运行、自主决策、直到终点条件满足才停止**。这不是"工具"，而是"进程"。
 
-**课程连接**：对应第 11 章 Pipeline 模式和第 18 章 Hooks。babysit-pr 把 Pipeline 从"一步一 Gate"升级到了"持续监控 + 自动修复 + 条件终止"。
+**教程连接**：对应第 11 章 Pipeline 模式和第 18 章 Hooks。babysit-pr 把 Pipeline 从"一步一 Gate"升级到了"持续监控 + 自动修复 + 条件终止"。
 
 ---
 
@@ -125,7 +125,7 @@ Each finding must include a specific file path and line number.
 
 **为什么这很重要**：普通审查 Skill 给一堆通用 checklist，Agent 扫一遍交差。Codex 的审查是：**一个编排器分发，5 个 Subagent 以 xhigh reasoning 并行审查，每个只盯一个维度，每个维度都是精确到代码库具体 trait、具体文件路径的领域规则。**
 
-**课程连接**：对应第 09 章 Reviewer 模式。Codex 把它推到了极致：不止流程与规则分离，还要审查维度之间并行独立。
+**教程连接**：对应第 09 章 Reviewer 模式。Codex 把它推到了极致：不止流程与规则分离，还要审查维度之间并行独立。
 
 ---
 
@@ -152,7 +152,7 @@ Two issues are being surfaced by users:
 
 **为什么这很重要**：普通"issue 摘要" Skill 让 Agent 自己判断哪个重要，但 Agent 容易被标题党误导。Codex 用**可量化的算法**替代主观判断：不是 Agent 觉得重要，而是"过去 24h 有 12 个独立用户在这个 issue 上留下了交互"。
 
-**课程连接**：对应第 24 章"六类评估指标"。🔥🔥 系统本质上是一套**自动化的"信号 vs 噪声"分离器**，让 Agent 的注意力聚焦在真正需要人工关注的议题上。
+**教程连接**：对应第 24 章"六类评估指标"。🔥🔥 系统本质上是一套**自动化的"信号 vs 噪声"分离器**，让 Agent 的注意力聚焦在真正需要人工关注的议题上。
 
 ---
 
@@ -183,7 +183,7 @@ Two issues are being surfaced by users:
 
 **为什么这很重要**：这个 Skill 的内容不可能在任何通用 Skill 或教程中找到。它是 Codex 团队在迁移到 URI 路径系统时，把**所有踩过的坑和架构约束**压缩成的领域规则。这正是第 13 章"Gotchas 最有价值"的极致体现——不是"常见错误"，而是"这个代码库在这个时间点上的所有禁区"。
 
-**课程连接**：对应第 13 章"Gotchas 坑点"和第 12 章"不写已知知识"。path-types 是终极补充知识型 Skill：补的不是"Rust 怎么用"，而是"Codex 的路径类型迁移到了哪个阶段、有哪些绝对不能做的边界"。
+**教程连接**：对应第 13 章"Gotchas 坑点"和第 12 章"不写已知知识"。path-types 是终极补充知识型 Skill：补的不是"Rust 怎么用"，而是"Codex 的路径类型迁移到了哪个阶段、有哪些绝对不能做的边界"。
 
 ---
 
@@ -209,13 +209,13 @@ Two issues are being surfaced by users:
 
 **为什么这很重要**：大部分 Skill 只写 Happy Path。Codex 的 `update-v8-version` 把 Happy Path 和 Failure Path 写成并列的第一级结构——失败不是一个"怎么办"的附注，而是流程的另一半。
 
-**课程连接**：对应第 11 章 Pipeline 模式。Codex 补了一课：Pipeline 不应该只有一个分支，要写 Failure Path 作为明确的、并列的流程。
+**教程连接**：对应第 11 章 Pipeline 模式。Codex 补了一课：Pipeline 不应该只有一个分支，要写 Failure Path 作为明确的、并列的流程。
 
 ---
 
-## 与课程五大模式的映射
+## 与教程五大模式的映射
 
-| 课程模式 | Codex Skill 中的体现 | 创新与突破 |
+| 教程模式 | Codex Skill 中的体现 | 创新与突破 |
 |----------|---------------------|-----------|
 | **Pipeline 模式** | `babysit-pr`（持续监控循环）、`update-v8-version`（含 Failure Path） | 把 Pipeline 从"一次性的步骤链"升级为"持续循环直到条件满足"，失败路径是第一等公民 |
 | **Reviewer 模式** | `code-review`（Subagent 编排器 + 5 个领域审查 Skill） | Subagent 并行审查替代单一审查，每个 Subagent 只盯一个极端领域化的维度 |
@@ -396,9 +396,9 @@ Do NOT: comment on others' threads, close/reopen PRs,
 
 ---
 
-## 对比本课程：它补充了什么
+## 对比本教程：它补充了什么
 
-| 本课程关注点 | openai/codex 的补充 |
+| 本教程关注点 | openai/codex 的补充 |
 |--------------|-------------------|
 | 五大模式 | Pipeline → 持续监控循环；Reviewer → Subagent 并行编排；Generator → 注意力量化算法 |
 | 三档自由度 | 低自由度：path-types（精确到 trait 和字段）；高自由度：babysit-pr（持续自主决策） |
@@ -407,7 +407,7 @@ Do NOT: comment on others' threads, close/reopen PRs,
 | Pipeline 模式 | Happy Path + Failure Path 并列，失败不是附注 |
 | 文件组织 | Subagent 编排器 + 领域审查 Skill 的分层架构 |
 
-如果说本课程教你"Skill 的设计方法论"，其他附录教你"不同场景下的 Skill 分类和实践"，Codex 教你的是：
+如果说本教程教你"Skill 的设计方法论"，其他附录教你"不同场景下的 Skill 分类和实践"，Codex 教你的是：
 
 > **Skill 被推到极端领域化时能达到什么深度——它不是"帮我做代码审查"，而是"在这个代码库的这条规则上，用这个检查维度，以 Subagent 并行方式审查"。**
 
