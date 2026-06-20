@@ -8,6 +8,7 @@ TODAY=$(date +%Y-%m-%d)
 
 echo "📖 合并章节..."
 
+# 生成合并文件头部
 cat > "$TMP_MD" << TITLEEOF
 ---
 title: "上手 Skill —— Agent Skill 设计、实战与评估全指南"
@@ -21,19 +22,22 @@ toc-depth: 1
 numbersections: true
 ---
 
-\pagenumbering{Roman}
+\newpage
 
-# 课程介绍
+# 课程介绍 {.unnumbered}
 
-**上手 Skill** 是一门从 0 到 1 掌握 Agent Skill 的完整教程，覆盖认知、设计、实战、评估与运营安全五大环节。
+TITLEEOF
 
-课程核心理念：**不是搬运理论，是真实踩坑的完整记录**。
+# 引入 README.md 作为课程介绍（跳过标题和语言切换行）
+tail -n +4 README.md >> "$TMP_MD"
+
+cat >> "$TMP_MD" << PAGEEOF
 
 \newpage
 
 \pagenumbering{arabic}
 
-TITLEEOF
+PAGEEOF
 
 # 按课程顺序合并正文章节
 for f in \
@@ -74,12 +78,14 @@ for f in \
 ; do
   file="${f}.md"
   if [ -f "$file" ]; then
-    # 提取文件名作为章节标题
+    # 提取文件名并去掉数字前缀作为章节标题
     basename="${f##*/}"
+    # 去掉 "00-"-"27-" 数字前缀，附录前缀保留
+    title=$(echo "$basename" | sed 's/^[0-9]\{2\}-//')
     echo "" >> "$TMP_MD"
     echo "\\newpage" >> "$TMP_MD"
     echo "" >> "$TMP_MD"
-    echo "# $basename" >> "$TMP_MD"
+    echo "# $title" >> "$TMP_MD"
     echo "" >> "$TMP_MD"
     cat "$file" >> "$TMP_MD"
     echo "" >> "$TMP_MD"
