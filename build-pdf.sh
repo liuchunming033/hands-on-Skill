@@ -100,7 +100,7 @@ for f in \
       # 附录: 提取数字 → appendix1, appendix2, ...
       appendix_num=$(echo "$basename" | grep -oE '^附录([0-9]+)' | grep -oE '[0-9]+')
       section_id="appendix${appendix_num}"
-      chapter_title="附录${appendix_num}"
+      chapter_title="$basename"
     else
       # 章节: 提取数字 → ch00, ch01, ch02, ...
       chapter_num=$(echo "$basename" | grep -oE '^[0-9]+')
@@ -115,6 +115,7 @@ for f in \
 
     # 包裹在 <section class="chapter" id="chXX"> 中，追加到 combined.html
     echo "<section class=\"chapter\" id=\"$section_id\">" >> "$BUILD_DIR/combined.html"
+    echo "<h1>$chapter_title</h1>" >> "$BUILD_DIR/combined.html"
     cat "$BUILD_DIR/fragment.html" >> "$BUILD_DIR/combined.html"
     echo "</section>" >> "$BUILD_DIR/combined.html"
     rm "$BUILD_DIR/fragment.html"

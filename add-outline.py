@@ -44,12 +44,12 @@ CHAPTER_TITLES = {
     "ch25": "A-B对比测试——持续验证与优化",
     "ch26": "Skill 的长期维护与团队管理",
     "ch27": "Skill 安全三原则——强大能力的风险管理",
-    "appendix1": "附录1-Anthropic 的 9 大 Skill 分类",
-    "appendix2": "附录2-OpenAI 的 Skill 实践案例",
-    "appendix3": "附录3-Superpowers 开源 Skill 库",
-    "appendix4": "附录4-addyosmani-agent-skills",
-    "appendix5": "附录5-garrytan-gstack",
-    "appendix6": "附录6-google-skills",
+    "appendix1": "Anthropic 的 9 大 Skill 分类——团队能力诊断地图",
+    "appendix2": "OpenAI 的 Skill 实践案例——代码助手能力构建",
+    "appendix3": "Superpowers 开源 Skill 库——社区驱动的能力复用",
+    "appendix4": "addyosmani-agent-skills——生产级Skill工作流设计",
+    "appendix5": "garrytan-gstack——创业者导向的完整产品研发流程",
+    "appendix6": "google-skills——平台化产品的安全Agent入口设计",
 }
 
 # 读取 PDF
@@ -61,12 +61,24 @@ writer = PdfWriter()
 for page in reader.pages:
     writer.add_page(page)
 
-# 添加书签导航（大纲）
+# 添加书签导航（大纲），带序号
 # chapter_pages 中的页码是 1-based
+outline_items = []  # [(page, title), ...]
 for ch_id, ch_page in sorted(chapter_pages.items(), key=lambda x: x[1]):
     title = CHAPTER_TITLES.get(ch_id, ch_id)
-    # page_offset 是 0-based
-    page_offset = ch_page - 1
+    # 生成序号前缀
+    if ch_id.startswith("appendix"):
+        num = ch_id.replace("appendix", "")
+        numbered_title = f"附录{num} {title}"
+    elif ch_id.startswith("ch"):
+        num = ch_id[2:]  # e.g., "00", "01"
+        numbered_title = f"{num} {title}"
+    else:
+        numbered_title = title
+    outline_items.append((ch_page, numbered_title))
+
+for ch_page, title in outline_items:
+    page_offset = ch_page - 1  # 0-based
     if page_offset < total_pages:
         writer.add_outline_item(title, page_offset, parent=None)
         print(f"  ✓ 书签: [{ch_page}] {title}")
