@@ -46,8 +46,9 @@ pre {
   overflow-x: auto;
   line-height: 1.45;
   text-align: left;
-  white-space: pre;
-  word-wrap: normal;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   tab-size: 4;
   text-indent: 0;
 }
@@ -58,7 +59,9 @@ pre code {
   margin: 0;
   font-size: 0.85em;
   text-align: left;
-  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   text-indent: 0;
 }
 
