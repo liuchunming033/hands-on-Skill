@@ -1,0 +1,49 @@
+name: Release PDF
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq pandoc texlive-xetex texlive-lang-chinese texlive-latex-recommended texlive-latex-extra lmodern
+
+      - name: Build PDF
+        run: |
+          chmod +x build-pdf.sh
+          bash build-pdf.sh "$(date +%Y.%m.%d)"
+
+      - name: Set release variables
+        id: vars
+        run: |
+          DATE_TAG=$(date +%Y.%m.%d)
+          echo "tag=v${DATE_TAG}-$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+          echo "name=v${DATE_TAG} (build #${{ github.run_number }})" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: ${{ steps.vars.outputs.name }}
+          body: |
+            ## 📄 上手 Skill — PDF Release
+
+            - **Commit**: ${{ github.sha }}
+            - **Build**: #${{ github.run_number }}
+            - **Trigger**: ${{ github.event.head_commit.message }}
+
+            > 自动生成于每次 main 分支推送。
+          files: hands-on-skill-*.pdf
+          prerelease: true
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
