@@ -2,9 +2,10 @@
 拼接独立 PDF 章节为完整教材，写入书签导航，并添加页码。
 用法: python3 merge.py <build_dir> <output.pdf>
 """
-import sys, os
-from pypdf import PdfReader, PdfWriter
-from pypdf.annotations import FreeText
+import sys, os, io
+from pypdf import PdfReader, PdfWriter, Transformation
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
 build_dir = sys.argv[1]
 output = sys.argv[2]
@@ -43,21 +44,27 @@ for pdf_file in pdf_files:
 total_pages = page_offset
 
 # 为页面添加页码（从 ch01 开始，连续编号）
-# 使用 FreeText 注解，避免 reportlab overlay 的白底覆盖问题
+# 用 reportlab 生成极小画布（只含页码文字），merge_transformed_page 贴到页脚
+# 小画布的白底仅覆盖页脚区域，不会影响正文
 if ch01_start_page is not None:
     for page_num in range(ch01_start_page, total_pages):
         display_num = page_num - ch01_start_page + 1
 
-        annotation = FreeText(
-            text=str(display_num),
-            rect=(295, 22, 305, 32),
-            font="Arial",
-            font_size="9pt",
-            font_color="8c8c8c",
-        )
-        annotation.flags = 4  # PRINT: 确保打印/渲染时可见
+        # 极小画布：宽 40pt，高 16pt，只够放一个页码数字
+        packet = io.BytesIO()
+        can = canvas.Canvas(packet, pagesize=(40, 16))
+        can.setFont("Helvetica", 9)
+        can.setFillColorRGB(0.55, 0.55, 0.55)
+        can.drawCentredString(20, 2, str(display_num))
+        can.save()
+        packet.seek(0)
 
-        writer.add_annotation(page_number=page_num, annotation=annotation)
+        overlay = PdfReader(packet).pages[0]
+
+        # A4 底部居中：x = A4宽/2 - 20, y = 15pt（页脚区）
+        transform = Transformation().translate(A4[0] / 2 - 20, 15)
+        writer.pages[page_num].merge_transformed_page(overlay, transform, over=True)
+
         print(f"    p{display_num}  ", end="")
         if display_num % 20 == 0:
             print()

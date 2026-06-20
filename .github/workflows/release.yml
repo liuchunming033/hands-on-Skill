@@ -16,7 +16,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq pandoc
-          pip install pypdf
+          pip install pypdf reportlab
           npm install
           npx playwright install --with-deps chromium
 
