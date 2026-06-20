@@ -4,6 +4,7 @@
 """
 import sys, io, json
 from pypdf import PdfReader, PdfWriter, Transformation
+from pypdf.generic import NameObject, FloatObject
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
@@ -102,11 +103,28 @@ for ch_page, title in outline_items:
         print(f"  ✓ 书签: [{ch_page}] {title}")
 
 # ---- 注册命名目标 ----
-# Chromium 已将 HTML <a href="#chXX"> 转为 PDF 命名目标链接，
-# 注册命名目标使这些链接在合并后的 PDF 中正确跳转。
+# Chromium 已将 HTML <a href="#chXX"> 转为 PDF 链接标注（/Dest /chXX），
+# 但不生成命名目标。我们在此注册，使链接在合并后的 PDF 中正确跳转。
+# pypdf 默认生成 /FitH 目标（指向页面顶部），我们修正为 /XYZ 坐标精确对准内容区顶部。
+# A4 (842.88pt) - 上边距(1.5cm≈42.5pt) - 页眉(≈13pt) ≈ 787pt
+CONTENT_TOP = 787.0
+
 print("  ✓ 注册命名目标...")
 for ch_id, ch_page in chapter_pages.items():
     writer.add_named_destination(ch_id, ch_page - 1 + PAGE_OFFSET)
+
+# 修正 /FitH → /XYZ，精确对准内容区顶部
+named_dest_array = writer.get_named_dest_root()
+for i in range(1, len(named_dest_array), 2):
+    dest_dict = named_dest_array[i].get_object()
+    d = dest_dict['/D']
+    if len(d) >= 2 and str(d[1]) == '/FitH':
+        d[1] = NameObject('/XYZ')
+        d[2] = FloatObject(0)             # left = 0
+        d.append(FloatObject(CONTENT_TOP))  # top = 内容区顶部
+        d.append(FloatObject(1))          # zoom = 100%
+
+for ch_id, ch_page in chapter_pages.items():
     print(f"    {ch_id} → 第 {ch_page + PAGE_OFFSET} 页")
 
 # ---- 添加页码 ----
