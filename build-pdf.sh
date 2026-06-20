@@ -49,7 +49,8 @@ cat > "$BUILD_DIR/combined.html" << 'HEADER_EOF'
 <body>
 HEADER_EOF
 
-# 追加 README body
+# 追加 PDF 封面标题 + README body
+echo '<h1>上手Skill / Hands on Skill</h1>' >> "$BUILD_DIR/combined.html"
 cat "$BUILD_DIR/README-body.html" >> "$BUILD_DIR/combined.html"
 rm "$BUILD_DIR/README-body.html"
 

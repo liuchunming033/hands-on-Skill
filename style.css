@@ -96,4 +96,3 @@ li + li { margin-top: .25em; }
 
 /* 每章另起一页 */
 section.chapter { page-break-before: always; }
-section.chapter:first-of-type { page-break-before: avoid; }
