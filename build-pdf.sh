@@ -137,8 +137,8 @@ node print-to-pdf.js "$BUILD_DIR/combined.html" "$BUILD_DIR/body.pdf"
 echo ""
 echo "🔖 分析章节页面位置..."
 
-# Step 7: 分析正文 HTML 的章节页面 + 捕获目录链接坐标
-node analyze-chapters.js "$BUILD_DIR/combined.html" "$BUILD_DIR/pages.json" "$BUILD_DIR/links.json"
+# Step 7: 从 PDF 中搜索章节标题，获取实际页码（避免模拟分页的累积误差）
+python3 find-chapter-pages.py "$BUILD_DIR/body.pdf" "$BUILD_DIR/pages.json"
 
 echo ""
 echo "🔖 合并 PDF、添加书签、页码与内链跳转..."
