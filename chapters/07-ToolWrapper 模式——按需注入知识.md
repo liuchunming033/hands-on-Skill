@@ -15,7 +15,7 @@
 
 Google Cloud Tech 团队研究了 Anthropic、Vertex AI、Google 内部的大量 Skill 构建实践，他们发现：**问题不在格式，而在内容设计逻辑**。从海量官方落地案例中，总结的高频通用五种模式，覆盖绝大多数工作场景。
 
-![five-patterns-overview.png](../images/five-patterns-overview.png)
+![五大模式概览](../images/five-patterns-overview.png)
 
 - Tool Wrapper：让您的代理瞬间成为任何库的专家。
     
@@ -44,7 +44,7 @@ Google Cloud Tech 团队研究了 Anthropic、Vertex AI、Google 内部的大量
 ---
 
 ## 💡 ToolWrapper 的解决方案
-![toolwrapper-pattern.png](../images/toolwrapper-pattern.png)
+![ToolWrapper 模式](../images/toolwrapper-pattern.png)
 
 **核心思想**：把内容放进 references（参考文档），让 Skill 来判断当前任务是否进入某个领域。只有判断命中，才加载那一套知识。
 

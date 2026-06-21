@@ -43,7 +43,7 @@
 
 - **检查什么** → 放进 checklist（可替换）
 - **怎么检查** → 留在 SKILL.md（流程不动）
-![reviewer-pattern.png](../images/reviewer-pattern.png)
+![Reviewer 模式](../images/reviewer-pattern.png)
 
 **流程**：
 

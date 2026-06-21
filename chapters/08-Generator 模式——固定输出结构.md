@@ -29,7 +29,7 @@
 ## 💡 Generator 的解决方案
 
 **核心思想**：把输出结构固定下来，让模型只需要填空。
-![generator-pattern.png](../images/generator-pattern.png)
+![Generator 模式](../images/generator-pattern.png)
 
 **分三层设计**：
 
