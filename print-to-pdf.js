@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 
-const HEADER = '上手Skill / Hands on Skill  | 最新版请看github.com/liuchunming033/hands-on-Skill';
+const HEADER = '上手Skill / Hands on Skill  | 最新版请看github.com/liuchunming033/hands-on-skill';
 
 (async () => {
   const input = path.resolve(process.argv[2]);
