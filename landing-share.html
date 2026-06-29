@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上手 Skill — Agent Skill 设计、实战与评估全指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0c0b;
+  --bg-card: #161412;
+  --bg-card-hover: #1e1b17;
+  --vermilion: #d4453b;
+  --vermilion-glow: #ff5e52;
+  --gold: #c9a96e;
+  --gold-light: #e0c78a;
+  --ink: #f0ebe0;
+  --ink-soft: #b8b0a4;
+  --ink-muted: #6b6560;
+  --border: #2a2520;
+  --border-glow: #3a322a;
+  --code-bg: #1a1714;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink-soft);
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Ambient texture — subtle noise on dark */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Subtle radial vignette */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, transparent 50%, rgba(0,0,0,0.4) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Decorative divider ---------- */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 64px 0;
+  opacity: 0.4;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.divider-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--vermilion);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--vermilion);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  padding: 80px 0 64px;
+  text-align: center;
+  position: relative;
+}
+
+/* Floating vermillion ring */
+.hero-ring {
+  position: absolute;
+  top: -80px;
+  right: -120px;
+  width: 320px;
+  height: 320px;
+  border: 1px solid rgba(212, 69, 59, 0.12);
+  border-radius: 50%;
+  animation: ring-drift 20s ease-in-out infinite;
+}
+@keyframes ring-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-20px, 30px) rotate(120deg); }
+  66% { transform: translate(15px, -20px) rotate(240deg); }
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 1px solid rgba(201, 169, 110, 0.25);
+  border-radius: 100px;
+  padding: 6px 18px;
+  margin-bottom: 36px;
+  backdrop-filter: blur(8px);
+}
+.hero-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--vermilion);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--vermilion);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.hero h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(42px, 8vw, 72px);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+.hero h1 .hl {
+  color: var(--vermilion);
+  position: relative;
+}
+.hero h1 .hl::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--vermilion);
+  opacity: 0.3;
+  border-radius: 1px;
+}
+
+.hero-sub {
+  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  opacity: 0.8;
+}
+
+.hero-desc {
+  font-size: 17px;
+  color: var(--ink-soft);
+  max-width: 480px;
+  margin: 0 auto 40px;
+  line-height: 2;
+  font-weight: 300;
+  position: relative;
+  padding: 0 32px;
+}
+.hero-desc::before, .hero-desc::after {
+  content: '"';
+  font-family: 'Noto Serif SC', serif;
+  font-size: 48px;
+  color: var(--vermilion);
+  opacity: 0.3;
+  position: absolute;
+  line-height: 1;
+}
+.hero-desc::before { top: -16px; left: 0; }
+.hero-desc::after { bottom: -32px; right: 0; }
+
+.hero-meta {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+.hero-meta .meta-item {
+  text-align: center;
+  padding: 20px 32px;
+  border-right: 1px solid var(--border);
+}
+.hero-meta .meta-item:last-child { border-right: none; }
+.meta-value {
+  font-family: 'Noto Serif SC', 'JetBrains Mono', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.meta-value.small { font-size: 28px; }
+.meta-label {
+  font-size: 11px;
+  color: var(--ink-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 16px 32px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+  letter-spacing: 0.5px;
+  position: relative;
+}
+.btn-primary {
+  background: var(--vermilion);
+  color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 0 0 rgba(212, 69, 59, 0.5);
+}
+.btn-primary:hover {
+  background: var(--vermilion-glow);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(212, 69, 59, 0.35);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--border-glow);
+  border-radius: 4px;
+}
+.btn-ghost:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(201, 169, 110, 0.1);
+}
+
+/* ---------- Pull Quote ---------- */
+.pull-quote {
+  margin: 72px 0;
+  padding: 56px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  position: relative;
+}
+.pull-quote::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 1px;
+  background: var(--vermilion);
+}
+.pull-quote blockquote {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.7;
+  max-width: 540px;
+  margin: 0 auto;
+}
+.pull-quote blockquote mark {
+  background: transparent;
+  color: var(--gold);
+  font-weight: 700;
+}
+.pull-quote cite {
+  display: block;
+  margin-top: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-style: normal;
+  color: var(--ink-muted);
+  letter-spacing: 2px;
+}
+
+/* ---------- Section ---------- */
+.section { padding: 64px 0; }
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--vermilion);
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--vermilion);
+  opacity: 0.4;
+}
+.section h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(26px, 5vw, 40px);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+.section p.lead {
+  font-size: 15px;
+  color: var(--ink-soft);
+  max-width: 480px;
+  line-height: 1.9;
+  font-weight: 300;
+}
+
+/* ---------- Learning Loop ---------- */
+.loop-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 48px 0;
+  position: relative;
+  padding-left: 40px;
+}
+.loop-vertical::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 20px;
+  bottom: 20px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--vermilion), var(--gold), var(--vermilion));
+  opacity: 0.3;
+}
+.loop-step {
+  position: relative;
+  padding: 20px 0 20px 32px;
+  transition: all 0.3s ease;
+}
+.loop-step::before {
+  content: '';
+  position: absolute;
+  left: -29px;
+  top: 28px;
+  width: 10px;
+  height: 10px;
+  background: var(--bg);
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+.loop-step:hover::before {
+  background: var(--vermilion);
+  border-color: var(--vermilion);
+  box-shadow: 0 0 16px rgba(212, 69, 59, 0.4);
+}
+.loop-step .step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--vermilion);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+.loop-step h4 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.loop-step .step-sub {
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+
+/* ---------- Chapter Cards ---------- */
+.chapter-cards {
+  display: grid;
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.chapter-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 28px 28px;
+  transition: all 0.35s ease;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.chapter-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(212, 69, 59, 0.03));
+  pointer-events: none;
+}
+.chapter-card:hover {
+  border-color: var(--border-glow);
+  background: var(--bg-card-hover);
+  transform: translateX(4px);
+}
+
+.chapter-card .card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.chapter-card .card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--vermilion);
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+.chapter-card h5 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.chapter-card .card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 13px;
+  color: var(--ink-muted);
+  line-height: 1.8;
+}
+.chapter-card .card-list span::before {
+  content: '#';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--gold);
+  margin-right: 4px;
+  opacity: 0.5;
+}
+
+/* ---------- Principle Cards ---------- */
+.principle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  margin-top: 48px;
+}
+@media (max-width: 500px) { .principle-grid { grid-template-columns: 1fr; } }
+
+.principle-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 32px 28px;
+  transition: all 0.35s ease;
+}
+.principle-card:hover {
+  border-color: var(--border-glow);
+  background: var(--bg-card-hover);
+}
+.principle-card .p-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--bg);
+  background: var(--vermilion);
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+.principle-card h4 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.principle-card p {
+  font-size: 13px;
+  color: var(--ink-muted);
+  line-height: 1.7;
+}
+
+/* ---------- Stats ---------- */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin: 56px 0;
+}
+@media (max-width: 500px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  text-align: center;
+  padding: 28px 16px;
+  transition: all 0.3s ease;
+}
+.stat-card:hover { border-color: var(--border-glow); }
+.stat-card .num {
+  font-family: 'Noto Serif SC', 'JetBrains Mono', serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-card .num.gold { color: var(--gold); }
+.stat-card .num.verm { color: var(--vermilion); }
+.stat-card .lbl {
+  font-size: 12px;
+  color: var(--ink-muted);
+  letter-spacing: 0.5px;
+}
+
+/* ---------- CTA ---------- */
+.cta-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 64px 40px;
+  text-align: center;
+  margin: 80px 0;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  border: 1px solid rgba(212, 69, 59, 0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.cta-section h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(24px, 5vw, 34px);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 12px;
+  position: relative;
+}
+.cta-section p {
+  font-size: 15px;
+  color: var(--ink-muted);
+  max-width: 420px;
+  margin: 0 auto 32px;
+  line-height: 1.8;
+  font-weight: 300;
+  position: relative;
+}
+.cta-section .btn-primary {
+  font-size: 16px;
+  padding: 18px 44px;
+}
+.cta-links {
+  margin-top: 28px;
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+.cta-links a {
+  color: var(--ink-muted);
+  text-decoration: none;
+  font-size: 13px;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: all 0.3s;
+}
+.cta-links a:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ---------- Footer ---------- */
+.footer {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--ink-muted);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  border-top: 1px solid var(--border);
+}
+.footer a { color: var(--vermilion); text-decoration: none; }
+.footer a:hover { color: var(--vermilion-glow); }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+  .hero { padding: 48px 0 40px; }
+  .hero h1 { font-size: 36px; }
+  .hero-meta .meta-item { padding: 14px 16px; }
+  .meta-value { font-size: 26px; }
+  .container { padding: 0 16px; }
+  .section { padding: 48px 0; }
+  .loop-vertical { padding-left: 28px; }
+  .loop-step { padding: 16px 0 16px 24px; }
+  .loop-step::before { left: -23px; width: 8px; height: 8px; }
+  .loop-vertical::before { left: 11px; }
+  .chapter-card { padding: 20px 18px; }
+  .cta-section { padding: 48px 24px; margin: 48px 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-ring"></div>
+
+  <div class="hero-badge">HANDS-ON GUIDE · 2025</div>
+
+  <div class="hero-sub">A Complete Guide to Agent Skills</div>
+
+  <h1>上手 <span class="hl">Skill</span></h1>
+
+  <p class="hero-desc">
+    Agent Skill 设计、实战与评估全指南。<br>
+    不搬运理论，只记录<strong>学到的、做到的、踩过坑的</strong>。
+  </p>
+
+  <div class="hero-meta">
+    <div class="meta-item">
+      <div class="meta-value">27</div>
+      <div class="meta-label">章节</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-value small">2.5h</div>
+      <div class="meta-label">阅读时长</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-value small">5min</div>
+      <div class="meta-label">每章</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-value">6</div>
+      <div class="meta-label">附录案例</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <a href="https://github.com/liuchunming033/hands-on-skill" class="btn btn-primary" target="_blank">
+      GitHub 在线阅读 &rarr;
+    </a>
+    <a href="https://github.com/liuchunming033/hands-on-skill/releases" class="btn btn-ghost" target="_blank">
+      下载 PDF &#8595;
+    </a>
+  </div>
+</header>
+
+<!-- Pull Quote -->
+<div class="pull-quote">
+  <blockquote>
+    好的 Skill 不是写一堆指令塞进去，<br>而是用一套<mark>隐性的设计语言</mark>——<br>什么时候加载知识、什么时候不加载、<br>什么时候问用户、什么时候强制检查。
+  </blockquote>
+  <cite>Follow builders, not influencers</cite>
+</div>
+
+<div class="divider">
+  <div class="divider-dot"></div>
+</div>
+
+<!-- Structure -->
+<section class="section">
+  <div class="section-label">The Learning Loop</div>
+  <h2>一个缩小版的<br>个人成长闭环</h2>
+  <p class="lead">这不是理论推导出来的，它就是真实摸索 Skill 的完整过程。</p>
+
+  <div class="loop-vertical">
+    <div class="loop-step">
+      <div class="step-num">PART I</div>
+      <h4>认知篇 · 6 章</h4>
+      <div class="step-sub">精输入 — 啃原始资料，建立认知框架</div>
+    </div>
+    <div class="loop-step">
+      <div class="step-num">PART II</div>
+      <h4>设计篇 · 5 章</h4>
+      <div class="step-sub">学模式 — 拆解五大核心设计模式</div>
+    </div>
+    <div class="loop-step">
+      <div class="step-num">PART III</div>
+      <h4>实战篇 · 8 章</h4>
+      <div class="step-sub">动手做 — 一行一行读、跑、改、验证</div>
+    </div>
+    <div class="loop-step">
+      <div class="step-num">PART IV</div>
+      <h4>评估篇 · 6 章</h4>
+      <div class="step-sub">验证效果 — 从"靠感觉"到"靠证据"</div>
+    </div>
+    <div class="loop-step">
+      <div class="step-num">PART V</div>
+      <h4>运营安全篇 · 2 章</h4>
+      <div class="step-sub">沉淀体系 — 长期维护与安全原则</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">
+  <div class="divider-dot"></div>
+</div>
+
+<!-- Chapters -->
+<section class="section">
+  <div class="section-label">Table of Contents</div>
+  <h2>27 章 + 导言 + 6 个附录</h2>
+  <p class="lead">每章独立完整，解决一个实际问题。可按需跳读，不必须序阅读。</p>
+
+  <div class="chapter-cards">
+    <div class="chapter-card">
+      <div class="card-head">
+        <span class="card-num">CH. 00</span>
+        <h5>导言 — Agent 架构全景</h5>
+      </div>
+      <div class="card-list">
+        <span>Prompt</span><span>Skill</span><span>Subagent</span><span>MCP</span>
+      </div>
+    </div>
+    <div class="chapter-card">
+      <div class="card-head">
+        <span class="card-num">CH. 01–06</span>
+        <h5>认知篇 — 建立 Skill 认知框架</h5>
+      </div>
+      <div class="card-list">
+        <span>为什么要学 Skill</span><span>文件结构与规范</span><span>YAML Frontmatter</span><span>渐进式披露</span><span>三档自由度</span><span>心智模型跃迁</span>
+      </div>
+    </div>
+    <div class="chapter-card">
+      <div class="card-head">
+        <span class="card-num">CH. 07–11</span>
+        <h5>设计篇 — 五大核心设计模式</h5>
+      </div>
+      <div class="card-list">
+        <span>ToolWrapper</span><span>Generator</span><span>Reviewer</span><span>Inversion</span><span>Pipeline</span>
+      </div>
+    </div>
+    <div class="chapter-card">
+      <div class="card-head">
+        <span class="card-num">CH. 12–19</span>
+        <h5>实战篇 — 编写实用 Skill 的技巧</h5>
+      </div>
+      <div class="card-list">
+        <span>不写已知知识</span><span>Gotchas 坑点</span><span>文件组织策略</span><span>避免过度约束</span><span>内存与配置</span><span>脚本封装</span><span>Hooks 机制</span><span>从 0 到 1 实战</span>
+      </div>
+    </div>
+    <div class="chapter-card">
+      <div class="card-head">
+        <span class="card-num">CH. 20–27</span>
+        <h5>评估 & 运营篇 — 质量保障与长期维护</h5>
+      </div>
+      <div class="card-list">
+        <span>为什么需要评估</span><span>两类 Skill 分类</span><span>七步生命周期</span><span>两类评分器</span><span>六类评估指标</span><span>A-B 对比测试</span><span>长期维护</span><span>安全三原则</span>
+      </div>
+    </div>
+    <div class="chapter-card">
+      <div class="card-head">
+        <span class="card-num">APP. 1–6</span>
+        <h5>附录 — 深度拆解六大社区实践</h5>
+      </div>
+      <div class="card-list">
+        <span>Anthropic 9 大分类</span><span>OpenAI 代码助手</span><span>Superpowers 开源库</span><span>addyosmani 工作流</span><span>garrytan gstack</span><span>Google 安全设计</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">
+  <div class="divider-dot"></div>
+</div>
+
+<!-- Design Principles -->
+<section class="section">
+  <div class="section-label">Design Principles</div>
+  <h2>这本教程凭什么不一样</h2>
+
+  <div class="principle-grid">
+    <div class="principle-card">
+      <div class="p-num">1</div>
+      <h4>真实案例驱动</h4>
+      <p>全部示例来自 Anthropic、Google、OpenAI 及社区开源 Skill 代码库，不是虚构场景。</p>
+    </div>
+    <div class="principle-card">
+      <div class="p-num">2</div>
+      <h4>内容即实践副产品</h4>
+      <p>不是"写教程项目"。是在搭建 AI 工作流过程中自然产出的记录。</p>
+    </div>
+    <div class="principle-card">
+      <div class="p-num">3</div>
+      <h4>MVP 驱动迭代</h4>
+      <p>每章 5 分钟，60 分完整可用就上线。先发布，根据反馈持续打磨。</p>
+    </div>
+    <div class="principle-card">
+      <div class="p-num">4</div>
+      <h4>把手弄脏</h4>
+      <p>每条结论都来自打开 SKILL.md 一行一行读、跑、改、验证。不读二手评测。</p>
+    </div>
+    <div class="principle-card">
+      <div class="p-num">5</div>
+      <h4>费曼法写作</h4>
+      <p>隐性知识显性化。不是官方文档翻译，是"学到的、做到的、踩过坑的"。</p>
+    </div>
+    <div class="principle-card">
+      <div class="p-num">6</div>
+      <h4>开放生态优先</h4>
+      <p>全部参考资料公开开源，零成本复现学习路径。不依赖闭源付费工具。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="num verm">39</div>
+    <div class="lbl">次迭代提交</div>
+  </div>
+  <div class="stat-card">
+    <div class="num gold">12+</div>
+    <div class="lbl">参考代码库</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">PDF</div>
+    <div class="lbl">完整电子版</div>
+  </div>
+  <div class="stat-card">
+    <div class="num gold">MIT</div>
+    <div class="lbl">开源协议</div>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>读完第 2 章，就能写出第一个 Skill</h2>
+  <p>AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎么写，看官方文档就够了。如果你想掌握判断力和设计直觉，这本教程是为你准备的。</p>
+  <a href="https://github.com/liuchunming033/hands-on-skill" class="btn btn-primary" target="_blank">
+    开始阅读 &rarr;
+  </a>
+  <div class="cta-links">
+    <a href="https://github.com/liuchunming033/hands-on-skill" target="_blank">GitHub</a>
+    <a href="https://github.com/liuchunming033/hands-on-skill/releases" target="_blank">下载 PDF</a>
+    <a href="https://github.com/liuchunming033/hands-on-skill#readme" target="_blank">English Version</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>《上手 Skill》· <a href="https://github.com/liuchunming033/hands-on-skill" target="_blank">github.com/liuchunming033/hands-on-skill</a> · MIT License</p>
+  <p style="margin-top:4px;opacity:0.5;">Learn by Doing · Follow Builders, Not Influencers</p>
+</footer>
+
+</div>
+
+</body>
+</html>

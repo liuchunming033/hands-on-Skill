@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上手 Skill — Agent Skill 设计、实战与评估全指南</title>
+<meta name="description" content="从 0 到 1 掌握 Agent Skill 的完整体系。27 章，每章 5 分钟，动手学，公开做。">
+<meta property="og:title" content="上手 Skill — Agent Skill 全指南">
+<meta property="og:description" content="不是翻译官方文档，是亲手拆解十几套开源 Skill 代码库后的完整记录。">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0d0b;
+  --bg-card: #181512;
+  --bg-card-hover: #201c17;
+  --fg: #e8e0d5;
+  --fg-soft: #b8afa2;
+  --fg-muted: #706860;
+  --vermilion: #d4453b;
+  --vermilion-bright: #ff5e52;
+  --vermilion-deep: #a82f28;
+  --gold: #c9a96e;
+  --gold-light: #e0c78a;
+  --gold-dim: #8a7350;
+  --border: #2a2520;
+  --border-light: #352f28;
+  --code-bg: #14110e;
+  --radius: 6px;
+  --max-w: 680px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg-soft);
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, transparent 55%, rgba(0,0,0,0.45) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  padding: 56px 0 40px;
+  text-align: center;
+  position: relative;
+}
+
+.hero-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  color: var(--vermilion);
+  border: 1px solid rgba(212, 69, 59, 0.3);
+  border-radius: 100px;
+  padding: 4px 16px;
+  margin-bottom: 28px;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-family: 'Noto Serif SC', 'SimSun', serif;
+  font-size: clamp(28px, 7vw, 44px);
+  font-weight: 900;
+  line-height: 1.25;
+  color: var(--fg);
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+}
+
+.hero h1 .accent {
+  color: var(--vermilion);
+  position: relative;
+}
+
+.hero h1 .accent::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--vermilion);
+  opacity: 0.25;
+  border-radius: 2px;
+}
+
+.hero .subtitle {
+  font-size: 16px;
+  color: var(--fg-muted);
+  max-width: 480px;
+  margin: 0 auto 32px;
+  line-height: 1.7;
+}
+
+.hero .subtitle strong {
+  color: var(--fg-soft);
+  font-weight: 500;
+}
+
+/* ---------- Stamp / seal decoration ---------- */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--vermilion);
+  border-radius: 50%;
+  color: var(--vermilion);
+  font-family: 'Noto Serif SC', serif;
+  font-size: 16px;
+  font-weight: 900;
+  transform: rotate(-8deg);
+  margin-bottom: 24px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+/* ---------- Stats row ---------- */
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--fg);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--fg-muted);
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Section ---------- */
+.section {
+  padding: 40px 0;
+}
+
+.section-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.section h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 700;
+  color: var(--fg);
+  line-height: 1.35;
+  margin-bottom: 12px;
+}
+
+.section h2 .num {
+  color: var(--vermilion);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7em;
+  margin-right: 0.3em;
+}
+
+.section > .desc {
+  color: var(--fg-muted);
+  font-size: 15px;
+  margin-bottom: 28px;
+  line-height: 1.7;
+}
+
+/* ---------- Divider ---------- */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 48px 0;
+  opacity: 0.35;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.divider .diamond {
+  width: 6px; height: 6px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+/* ---------- Chapter grid ---------- */
+.chapter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.chapter-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  cursor: default;
+  transition: background 0.3s, border-color 0.3s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.chapter-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+  transform: translateX(4px);
+}
+
+.chapter-card .ch-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--vermilion);
+  margin-right: 8px;
+  opacity: 0.8;
+}
+
+.chapter-card .ch-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg-soft);
+  line-height: 1.5;
+}
+
+.chapter-card .ch-desc {
+  font-size: 12px;
+  color: var(--fg-muted);
+  margin-top: 4px;
+  line-height: 1.5;
+  padding-left: 28px;
+}
+
+/* ---------- Feature cards ---------- */
+.feature-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+}
+
+.feature-card .feat-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.feature-card h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+
+.feature-card p {
+  font-size: 13px;
+  color: var(--fg-muted);
+  line-height: 1.6;
+}
+
+/* ---------- Quote block ---------- */
+.quote-block {
+  background: var(--bg-card);
+  border-left: 3px solid var(--vermilion);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 24px 28px;
+  margin: 32px 0;
+  position: relative;
+}
+
+.quote-block::before {
+  content: '\201C';
+  position: absolute;
+  top: 8px;
+  left: 14px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 48px;
+  color: var(--vermilion);
+  opacity: 0.2;
+  line-height: 1;
+}
+
+.quote-block p {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--fg);
+  line-height: 1.6;
+  position: relative;
+}
+
+.quote-block .attribution {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  color: var(--fg-muted);
+  margin-top: 12px;
+  font-weight: 400;
+}
+
+/* ---------- Learning paths ---------- */
+.path-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 12px;
+}
+
+.path-card .path-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.path-card .path-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+.path-card h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.path-card p {
+  font-size: 13px;
+  color: var(--fg-muted);
+  line-height: 1.6;
+}
+
+/* ---------- CTA ---------- */
+.cta-section {
+  text-align: center;
+  padding: 56px 0 64px;
+}
+
+.cta-section h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 12px;
+}
+
+.cta-section p {
+  color: var(--fg-muted);
+  font-size: 15px;
+  margin-bottom: 28px;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--vermilion);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--vermilion-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(212, 69, 59, 0.3);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--fg-soft);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 28px;
+  border-radius: 100px;
+  text-decoration: none;
+  border: 1px solid var(--border-light);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: var(--fg-muted);
+  background: var(--bg-card);
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  text-align: center;
+  padding: 32px 0 48px;
+  font-size: 12px;
+  color: var(--fg-muted);
+  opacity: 0.6;
+}
+
+/* ---------- Animation ---------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeUp 0.6s ease-out both;
+}
+
+.animate-in:nth-child(1) { animation-delay: 0s; }
+.animate-in:nth-child(2) { animation-delay: 0.1s; }
+.animate-in:nth-child(3) { animation-delay: 0.2s; }
+.animate-in:nth-child(4) { animation-delay: 0.3s; }
+.animate-in:nth-child(5) { animation-delay: 0.4s; }
+.animate-in:nth-child(6) { animation-delay: 0.5s; }
+.animate-in:nth-child(7) { animation-delay: 0.6s; }
+.animate-in:nth-child(8) { animation-delay: 0.7s; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+  .hero { padding: 40px 0 28px; }
+  .hero h1 { font-size: 26px; }
+  .stats-row { gap: 20px; }
+  .stat-number { font-size: 24px; }
+  .section { padding: 32px 0; }
+  .quote-block p { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<main class="container">
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-badge">TUTORIAL &middot; 2025</div>
+    <h1>上手 <span class="accent">Skill</span></h1>
+    <p class="subtitle">Agent Skill 设计、实战与评估全指南<br>
+    <strong>不是翻译官方文档。</strong>是亲手拆解十几套开源 Skill 代码库、在自己的场景里验证、踩坑修正后的完整记录。</p>
+    <div class="stamp">授</div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-number">27<span style="font-size:0.6em;color:var(--fg-muted)">+6</span></div>
+      <div class="stat-label">章节 + 附录</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">5<span style="font-size:0.6em;color:var(--fg-muted)">min</span></div>
+      <div class="stat-label">每章阅读</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">2.5<span style="font-size:0.6em;color:var(--fg-muted)">h</span></div>
+      <div class="stat-label">完整阅读</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">12<span style="font-size:0.6em;color:var(--fg-muted)">+</span></div>
+      <div class="stat-label">参考开源库</div>
+    </div>
+  </div>
+
+  <div class="divider"><span class="diamond"></span></div>
+
+  <!-- Why -->
+  <section class="section">
+    <div class="section-tag">Why This</div>
+    <h2>好的 Skill 不是"写一堆指令塞进去"</h2>
+    <p class="desc">格式文档人人能读，但<strong style="color:var(--fg-soft)">设计直觉没人教</strong>。什么时候加载知识？什么时候不加载？什么时候问用户？什么时候强制检查？—— 这些隐性知识，只有亲手拆解过十几套代码库的人才讲得清楚。</p>
+
+    <div class="quote-block">
+      <p>follow builders, not influencers.</p>
+      <div class="attribution">— 输入原则。参考代码库的作者：Garry Tan、Addy Osmani、Karpathy、OpenAI Codex 团队、Google Cloud 团队 — 都是亲手做产品、落地工具的实干者。</div>
+    </div>
+  </section>
+
+  <div class="divider"><span class="diamond"></span></div>
+
+  <!-- Structure -->
+  <section class="section">
+    <div class="section-tag">Structure</div>
+    <h2><span class="num">01</span>教程结构</h2>
+    <p class="desc">五篇递进：先建立认知 → 再掌握设计模式 → 再动手实战 → 再用评估验证 → 最后沉淀为运营体系。每章 5 分钟，读完就能动手。</p>
+
+    <div class="chapter-grid">
+      <div class="chapter-card animate-in">
+        <span class="ch-num">认知篇</span>
+        <span class="ch-title">建立 Skill 的基础认知框架</span>
+        <div class="ch-desc">6 章 — 从"为什么要学"到"心智模型跃迁"</div>
+      </div>
+      <div class="chapter-card animate-in">
+        <span class="ch-num">设计篇</span>
+        <span class="ch-title">五大设计模式，解决常见问题</span>
+        <div class="ch-desc">5 章 — ToolWrapper / Generator / Reviewer / Inversion / Pipeline</div>
+      </div>
+      <div class="chapter-card animate-in">
+        <span class="ch-num">实战篇</span>
+        <span class="ch-title">学会编写真正有用的 Skill</span>
+        <div class="ch-desc">8 章 — Gotchas 坑点、文件组织、脚本、Hooks、从0到1完整案例</div>
+      </div>
+      <div class="chapter-card animate-in">
+        <span class="ch-num">评估篇</span>
+        <span class="ch-title">建立 Skill 的质量保障体系</span>
+        <div class="ch-desc">6 章 — 两类 Skill、七步生命周期、评分器、A/B 对比测试</div>
+      </div>
+      <div class="chapter-card animate-in">
+        <span class="ch-num">运营安全篇</span>
+        <span class="ch-title">让 Skill 在团队中长期稳定运行</span>
+        <div class="ch-desc">2 章 — 长期维护与团队管理、安全三原则</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><span class="diamond"></span></div>
+
+  <!-- Features -->
+  <section class="section">
+    <div class="section-tag">Features</div>
+    <h2><span class="num">02</span>为什么值得读</h2>
+
+    <div class="feature-list">
+      <div class="feature-card animate-in">
+        <div class="feat-icon">&#x1F50D;</div>
+        <h4>真实案例驱动</h4>
+        <p>所有示例和分析来自公开开源 Skill 代码库 — 不是读别人写的评测，是自己打开 SKILL.md 一行一行看、跑、改、验证。</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feat-icon">&#x1F4A1;</div>
+        <h4>问题导向，5 分钟可读完</h4>
+        <p>每章解决一个实际问题。你不需要读完 27 章才开始写第一个 Skill，读完第 2 章就够。</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feat-icon">&#x1F3AF;</div>
+        <h4>用费曼法写出来</h4>
+        <p>把所有隐性知识显性化，讲清楚、讲通透。这不是一本官方文档的翻译，是"学到、做到、踩过坑"的完整记录。</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feat-icon">&#x1F310;</div>
+        <h4>开放生态，零成本复现</h4>
+        <p>全部参考案例来自公开开源仓库，不依赖任何闭源付费工具。普通人零成本就能复现全部学习路径。</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><span class="diamond"></span></div>
+
+  <!-- Learning Paths -->
+  <section class="section">
+    <div class="section-tag">Paths</div>
+    <h2><span class="num">03</span>三条学习路径</h2>
+
+    <div class="path-card animate-in">
+      <div class="path-header">
+        <span class="path-time">1h</span>
+        <h4>快速入门</h4>
+      </div>
+      <p>导言 → 认知篇精选 → 最核心的 2 个设计模式 → 实战基础。适合想快速了解 Skill 基本概念的读者。</p>
+    </div>
+    <div class="path-card animate-in">
+      <div class="path-header">
+        <span class="path-time">2.5h</span>
+        <h4>完整掌握</h4>
+      </div>
+      <p>按顺序阅读全部 27 章 + 附录。重点理解设计篇和实战篇，跟随第 19 章从 0 到 1 完成一个完整 Skill。适合需要系统学习的读者。</p>
+    </div>
+    <div class="path-card animate-in">
+      <div class="path-header">
+        <span class="path-time">30min</span>
+        <h4>按问题查找</h4>
+      </div>
+      <p>Skill 不触发？输出不稳定？Context 过载？Agent 盲目猜测？直接跳到对应章节，5 分钟找到答案。</p>
+    </div>
+  </section>
+
+  <div class="divider"><span class="diamond"></span></div>
+
+  <!-- Quote -->
+  <div class="quote-block">
+    <p>AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎么写，看 Anthropic 官方文档就够了。如果你想掌握"写一个好 Skill"的判断力和设计直觉，这本教程是为你准备的。</p>
+  </div>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>开始上手 Skill</h2>
+    <p>27 章，每章 5 分钟。读完第 2 章就能动手写第一个 Skill。</p>
+    <div class="cta-buttons">
+      <a href="https://github.com/ChainlessSmith/hands-on-skill-dev" class="btn-primary" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub 仓库
+      </a>
+      <a href="https://github.com/ChainlessSmith/hands-on-skill-dev/blob/main/hands-on-skill-dev.pdf" class="btn-secondary" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        下载 PDF
+      </a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>follow builders, not influencers &middot; 动手学，公开做，持续迭代</p>
+  </footer>
+
+</main>
+
+</body>
+</html>

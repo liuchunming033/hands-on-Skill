@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上手 Skill — Agent Skill 设计、实战与评估全指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #faf8f3;
+  --paper-warm: #f3efe6;
+  --ink: #1a1714;
+  --ink-soft: #4a4540;
+  --ink-muted: #8a8278;
+  --vermillion: #c94b2f;
+  --vermillion-glow: #e85d3a;
+  --gold: #b8956a;
+  --border: #e0d9cc;
+  --border-light: #ece6d8;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink-soft);
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain texture */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  padding: 100px 0 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative seal */
+.hero-seal {
+  position: absolute;
+  right: 0;
+  top: 60px;
+  width: 100px;
+  height: 100px;
+  border: 2.5px solid var(--vermillion);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  animation: seal-rotate 40s linear infinite;
+}
+@keyframes seal-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.hero-seal span {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--vermillion);
+  letter-spacing: 4px;
+  writing-mode: vertical-rl;
+}
+
+.hero-eyebrow {
+  font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--vermillion);
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.hero-eyebrow::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 1px;
+  background: var(--vermillion);
+  opacity: 0.4;
+}
+
+.hero h1 {
+  font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
+  font-size: clamp(44px, 7vw, 76px);
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: -1px;
+  margin-bottom: 32px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--vermillion);
+  position: relative;
+}
+.hero h1 em::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--vermillion);
+  opacity: 0.2;
+}
+
+.hero-desc {
+  font-size: 18px;
+  color: var(--ink-soft);
+  max-width: 540px;
+  line-height: 1.9;
+  margin-bottom: 40px;
+  border-left: 3px solid var(--gold);
+  padding-left: 24px;
+  font-weight: 300;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+.meta-item {
+  display: flex;
+  flex-direction: column;
+}
+.meta-value {
+  font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+.meta-label {
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 4px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 16px 32px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 4px;
+}
+.btn-primary:hover {
+  background: var(--vermillion);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(201, 75, 47, 0.3);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+}
+.btn-ghost:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+}
+
+/* ---------- Pull Quote ---------- */
+.pull-quote {
+  margin: 80px 0;
+  padding: 48px 0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  text-align: center;
+}
+.pull-quote blockquote {
+  font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
+  font-size: clamp(22px, 3.5vw, 30px);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.6;
+  max-width: 720px;
+  margin: 0 auto;
+  font-style: italic;
+}
+.pull-quote cite {
+  display: block;
+  margin-top: 20px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  color: var(--ink-muted);
+  letter-spacing: 1px;
+}
+.pull-quote cite::before {
+  content: '— ';
+  color: var(--vermillion);
+}
+
+/* ---------- Structure ---------- */
+.section { padding: 80px 0; }
+.section-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: var(--vermillion);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 600;
+  font-style: italic;
+  margin-bottom: 16px;
+}
+.section h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(28px, 4.5vw, 42px);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 20px;
+}
+.section p.lead {
+  font-size: 16px;
+  color: var(--ink-soft);
+  max-width: 560px;
+  line-height: 1.8;
+}
+
+/* Circle flow */
+.flow-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+  margin: 56px 0;
+  position: relative;
+}
+.flow-step {
+  text-align: center;
+  padding: 32px 28px;
+  position: relative;
+  background: var(--paper);
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  min-width: 140px;
+  transition: all 0.3s ease;
+}
+.flow-step:hover {
+  border-color: var(--vermillion);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+}
+.flow-step .step-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--vermillion);
+  line-height: 1;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+.flow-step h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.flow-step .step-sub {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.flow-arrow {
+  font-size: 20px;
+  color: var(--gold);
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+@media (max-width: 768px) {
+  .flow-arrow { display: none; }
+  .flow-circle { gap: 12px; flex-direction: column; }
+  .flow-step { min-width: 100%; }
+}
+
+/* ---------- Chapters ---------- */
+.chapters-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  background: var(--border);
+  margin-top: 48px;
+  border: 1px solid var(--border);
+}
+@media (max-width: 900px) { .chapters-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 500px) { .chapters-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.chapter-group {
+  background: var(--paper);
+  padding: 24px 20px;
+}
+.chapter-group h5 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--vermillion);
+  display: inline-block;
+}
+.chapter-list {
+  list-style: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 2;
+}
+.chapter-list li::before {
+  content: '§ ';
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+
+/* ---------- Features ---------- */
+.features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px 48px;
+  margin-top: 48px;
+}
+@media (max-width: 600px) { .features { grid-template-columns: 1fr; } }
+.feature h4 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.feature h4 .num {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--paper);
+  background: var(--vermillion);
+  margin-right: 10px;
+  vertical-align: middle;
+}
+.feature p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* ---------- Stats ---------- */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  margin: 64px 0;
+}
+@media (max-width: 600px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+.stat-card {
+  background: var(--paper);
+  text-align: center;
+  padding: 32px 20px;
+}
+.stat-card .num {
+  font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-card .lbl {
+  font-size: 13px;
+  color: var(--ink-muted);
+  letter-spacing: 0.5px;
+}
+
+/* ---------- CTA ---------- */
+.cta-band {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 80px 48px;
+  text-align: center;
+  margin: 80px -48px 0;
+}
+@media (max-width: 768px) {
+  .cta-band { margin: 60px -32px 0; padding: 60px 32px; }
+}
+.cta-band h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(28px, 4.5vw, 42px);
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #fff;
+}
+.cta-band p {
+  font-size: 16px;
+  opacity: 0.7;
+  max-width: 500px;
+  margin: 0 auto 32px;
+  font-weight: 300;
+  line-height: 1.8;
+}
+.cta-band .btn-primary {
+  background: var(--vermillion);
+  color: #fff;
+  font-size: 16px;
+  padding: 18px 40px;
+  box-shadow: 0 4px 24px rgba(201, 75, 47, 0.4);
+}
+.cta-band .btn-primary:hover {
+  background: var(--vermillion-glow);
+  box-shadow: 0 8px 36px rgba(201, 75, 47, 0.5);
+}
+.cta-links {
+  margin-top: 28px;
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.cta-links a {
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 2px;
+  transition: all 0.2s;
+}
+.cta-links a:hover { color: #fff; border-bottom-color: var(--vermillion); }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+.footer a { color: var(--vermillion); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-seal"><span>上手</span></div>
+
+  <div class="hero-eyebrow">A Hands-On Guide to Agent Skills</div>
+
+  <h1>上手 <em>Skill</em><br>Agent Skill 设计、实战与评估全指南</h1>
+
+  <p class="hero-desc">
+    从 0 到 1 掌握 Agent Skill 的完整体系。<br>
+    不搬运理论，只记录<strong>学到的、做到的、踩过坑的</strong>。
+  </p>
+
+  <div class="hero-meta">
+    <div class="meta-item">
+      <span class="meta-value">27</span>
+      <span class="meta-label">章节</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-value">2.5h</span>
+      <span class="meta-label">阅读时长</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-value">5min</span>
+      <span class="meta-label">每章</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-value">6</span>
+      <span class="meta-label">附录案例</span>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <a href="https://github.com/liuchunming033/hands-on-skill" class="btn btn-primary" target="_blank">
+      GitHub 在线阅读
+    </a>
+    <a href="https://github.com/liuchunming033/hands-on-skill/releases" class="btn btn-ghost" target="_blank">
+      下载 PDF &darr;
+    </a>
+  </div>
+</header>
+
+<!-- Pull Quote -->
+<div class="pull-quote">
+  <blockquote>
+    "好的 Skill 不是写一堆指令塞进去，<br>而是用一套隐性的设计语言——<br>什么时候加载知识、什么时候不加载、<br>什么时候问用户、什么时候强制检查。"
+  </blockquote>
+  <cite>Follow builders, not influencers</cite>
+</div>
+
+<!-- Structure -->
+<section class="section">
+  <div class="section-label">The Learning Loop</div>
+  <h2>一个缩小版的个人成长闭环</h2>
+  <p class="lead">这不是理论推导出来的，它就是真实摸索 Skill 的完整过程。</p>
+
+  <div class="flow-circle">
+    <div class="flow-step">
+      <div class="step-num">I</div>
+      <h4>认知篇</h4>
+      <div class="step-sub">精输入</div>
+    </div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">
+      <div class="step-num">II</div>
+      <h4>设计篇</h4>
+      <div class="step-sub">学模式</div>
+    </div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">
+      <div class="step-num">III</div>
+      <h4>实战篇</h4>
+      <div class="step-sub">动手做</div>
+    </div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">
+      <div class="step-num">IV</div>
+      <h4>评估篇</h4>
+      <div class="step-sub">验证效果</div>
+    </div>
+    <span class="flow-arrow">&rarr;</span>
+    <div class="flow-step">
+      <div class="step-num">V</div>
+      <h4>运营安全篇</h4>
+      <div class="step-sub">沉淀体系</div>
+    </div>
+  </div>
+</section>
+
+<!-- Chapters -->
+<section class="section">
+  <div class="section-label">Table of Contents</div>
+  <h2>27 章 + 导言 + 6 个附录</h2>
+  <p class="lead">每章独立完整，解决一个实际问题。可按需跳读，不必须序阅读。</p>
+
+  <div class="chapters-grid">
+    <div class="chapter-group">
+      <h5>导言</h5>
+      <ul class="chapter-list">
+        <li>Agent 架构全景</li>
+      </ul>
+    </div>
+    <div class="chapter-group">
+      <h5>认知篇 &middot; 6 章</h5>
+      <ul class="chapter-list">
+        <li>为什么要学 Skill</li>
+        <li>文件结构与核心规范</li>
+        <li>YAML Frontmatter 精髓</li>
+        <li>渐进式披露原理</li>
+        <li>三档自由度</li>
+        <li>心智模型跃迁</li>
+      </ul>
+    </div>
+    <div class="chapter-group">
+      <h5>设计篇 &middot; 5 章</h5>
+      <ul class="chapter-list">
+        <li>ToolWrapper 模式</li>
+        <li>Generator 模式</li>
+        <li>Reviewer 模式</li>
+        <li>Inversion 模式</li>
+        <li>Pipeline 模式</li>
+      </ul>
+    </div>
+    <div class="chapter-group">
+      <h5>实战篇 &middot; 8 章</h5>
+      <ul class="chapter-list">
+        <li>不写已知知识</li>
+        <li>Gotchas 坑点</li>
+        <li>文件组织策略</li>
+        <li>避免过度约束</li>
+        <li>内存与配置</li>
+        <li>脚本封装</li>
+        <li>Hooks 机制</li>
+        <li>从 0 到 1 实战</li>
+      </ul>
+    </div>
+    <div class="chapter-group">
+      <h5>评估 & 运营 &middot; 8 章</h5>
+      <ul class="chapter-list">
+        <li>为什么需要评估</li>
+        <li>两类 Skill 分类</li>
+        <li>七步生命周期</li>
+        <li>两类评分器</li>
+        <li>六类评估指标</li>
+        <li>A-B 对比测试</li>
+        <li>长期维护</li>
+        <li>安全三原则</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section">
+  <div class="section-label">Design Principles</div>
+  <h2>这本教程凭什么不一样</h2>
+
+  <div class="features">
+    <div class="feature">
+      <h4><span class="num">1</span>真实案例驱动</h4>
+      <p>所有示例来自 Anthropic、Google、OpenAI 及社区开源 Skill 代码库，不是虚构场景。</p>
+    </div>
+    <div class="feature">
+      <h4><span class="num">2</span>内容即实践副产品</h4>
+      <p>不是"写教程项目"。是在搭建 AI 工作流、研究 Agent 能力边界中自然产出的记录。</p>
+    </div>
+    <div class="feature">
+      <h4><span class="num">3</span>MVP 驱动迭代</h4>
+      <p>每章 5 分钟，60 分完整可用就上线。先发布，根据反馈持续打磨。</p>
+    </div>
+    <div class="feature">
+      <h4><span class="num">4</span>把手弄脏</h4>
+      <p>每条结论都来自亲自打开 SKILL.md 一行一行读、跑、改、验证。不读二手评测。</p>
+    </div>
+    <div class="feature">
+      <h4><span class="num">5</span>费曼法写作</h4>
+      <p>隐性知识显性化。这不是官方文档的翻译，是"学到的、做到的、踩过坑的"。</p>
+    </div>
+    <div class="feature">
+      <h4><span class="num">6</span>开放生态优先</h4>
+      <p>全部参考资料公开开源，零成本复现学习路径。不依赖闭源付费工具。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="num">39</div>
+    <div class="lbl">次迭代提交</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">12+</div>
+    <div class="lbl">参考代码库</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">PDF</div>
+    <div class="lbl">完整电子版</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">MIT</div>
+    <div class="lbl">开源协议</div>
+  </div>
+</div>
+
+</div>
+
+<!-- CTA -->
+<section class="cta-band">
+  <div class="wrapper">
+    <h2>读完第 2 章，就能写出第一个 Skill</h2>
+    <p>AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎么写，看官方文档就够了。如果你想掌握判断力和设计直觉，这本教程是为你准备的。</p>
+    <a href="https://github.com/liuchunming033/hands-on-skill" class="btn btn-primary" target="_blank">
+      开始阅读 &rarr;
+    </a>
+    <div class="cta-links">
+      <a href="https://github.com/liuchunming033/hands-on-skill" target="_blank">GitHub</a>
+      <a href="https://github.com/liuchunming033/hands-on-skill/releases" target="_blank">下载 PDF</a>
+      <a href="https://github.com/liuchunming033/hands-on-skill#readme" target="_blank">English Version</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrapper">
+    <p>《上手 Skill》· <a href="https://github.com/liuchunming033/hands-on-skill" target="_blank">github.com/liuchunming033/hands-on-skill</a> · MIT License</p>
+  </div>
+</footer>
+
+</body>
+</html>

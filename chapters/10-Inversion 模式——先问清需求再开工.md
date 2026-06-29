@@ -37,7 +37,7 @@ Agent 可能会猜：
 ## 💡 Inversion 的解决方案
 
 **核心思想**：把流程反过来——Agent 先发问，用户先回答。
-![Inversion 模式](../images/inversion-pattern.png)
+![Inversion 模式](inversion-pattern.png)
 
 **三阶段设计**：
 

@@ -1,6 +1,6 @@
 # 上手 Skill —— Agent Skill 设计、实战与评估全指南
 
-[English](./README.en.md) | 简体中文
+[English](README.en.md) | 简体中文
 
 > **教程简介**：从 0 到 1 掌握 Agent Skill 的完整体系——认知、设计、实战、评估、运营安全
 > 
@@ -72,7 +72,7 @@ AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎
 
 ### 导言
 
-- [00-导言——Agent 架构全景：四大组件定位](./chapters/00-导言——Agent架构全景：四大组件定位.md) — Prompt / Skill / Subagent / MCP 的区别与定位
+- [00-导言——Agent 架构全景：四大组件定位](00-导言——Agent架构全景：四大组件定位.md) — Prompt / Skill / Subagent / MCP 的区别与定位
 
 ---
 
@@ -80,12 +80,12 @@ AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎
 
 **目标**：建立 Skill 的基础认知框架
 
-- [01-为什么要学 Skill？—— 通用智能体的最后一公里](./chapters/01-为什么要学%20Skill？——%20通用智能体的最后一公里.md) — Skill 的价值与必要性，从 prompt 到能力的跃迁
-- [02-Skill 长什么样？—— 文件结构与核心规范](./chapters/02-Skill%20长什么样？——%20文件结构与核心规范.md) — 文件结构、命名规范、目录组织
-- [03-YAML Frontmatter 的精髓——写好 description 是成功的一半](./chapters/03-YAML%20Frontmatter%20的精髓——写好%20description%20是成功的一半.md) — description 字段的核心作用与写法
-- [04-渐进式披露——Skill 碾压传统 Prompt 的核心设计原理](./chapters/04-渐进式披露——Skill%20碾压传统%20Prompt%20的核心设计原理.md) — 三级加载机制，突破上下文限制
-- [05-三档自由度——如何把控指令的粗细粒度](./chapters/05-三档自由度——如何把控指令的粗细粒度.md) — 高/中/低自由度的控制策略
-- [06-心智模型跃迁——从写步骤到写决策框架](./chapters/06-心智模型跃迁——从写步骤到写决策框架.md) — 从"写 prompt"到"构建能力"的思维转变
+- [01-为什么要学 Skill？—— 通用智能体的最后一公里](01-为什么要学%20Skill？——%20通用智能体的最后一公里.md) — Skill 的价值与必要性，从 prompt 到能力的跃迁
+- [02-Skill 长什么样？—— 文件结构与核心规范](02-Skill%20长什么样？——%20文件结构与核心规范.md) — 文件结构、命名规范、目录组织
+- [03-YAML Frontmatter 的精髓——写好 description 是成功的一半](03-YAML%20Frontmatter%20的精髓——写好%20description%20是成功的一半.md) — description 字段的核心作用与写法
+- [04-渐进式披露——Skill 碾压传统 Prompt 的核心设计原理](04-渐进式披露——Skill%20碾压传统%20Prompt%20的核心设计原理.md) — 三级加载机制，突破上下文限制
+- [05-三档自由度——如何把控指令的粗细粒度](05-三档自由度——如何把控指令的粗细粒度.md) — 高/中/低自由度的控制策略
+- [06-心智模型跃迁——从写步骤到写决策框架](06-心智模型跃迁——从写步骤到写决策框架.md) — 从"写 prompt"到"构建能力"的思维转变
 
 ---
 
@@ -93,11 +93,11 @@ AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎
 
 **目标**：掌握 Skill 的核心设计模式，解决常见问题
 
-- [07-ToolWrapper 模式——按需注入知识](./chapters/07-ToolWrapper%20模式——按需注入知识.md) — 按需加载领域知识，避免 context 过载
-- [08-Generator 模式——固定输出结构](./chapters/08-Generator%20模式——固定输出结构.md) — 模板化输出，解决格式不稳定问题
-- [09-Reviewer 模式——分离审查与检查规则](./chapters/09-Reviewer%20模式——分离审查与检查规则.md) — 流程与规则解耦，灵活替换
-- [10-Inversion 模式——先问清需求再开工](./chapters/10-Inversion%20模式——先问清需求再开工.md) — 主动询问机制，避免盲目猜测
-- [11-Pipeline 模式——分步执行流程](./chapters/11-Pipeline%20模式——分步执行流程.md) — Gate 机制，防止跳步骤
+- [07-ToolWrapper 模式——按需注入知识](07-ToolWrapper%20模式——按需注入知识.md) — 按需加载领域知识，避免 context 过载
+- [08-Generator 模式——固定输出结构](08-Generator%20模式——固定输出结构.md) — 模板化输出，解决格式不稳定问题
+- [09-Reviewer 模式——分离审查与检查规则](09-Reviewer%20模式——分离审查与检查规则.md) — 流程与规则解耦，灵活替换
+- [10-Inversion 模式——先问清需求再开工](10-Inversion%20模式——先问清需求再开工.md) — 主动询问机制，避免盲目猜测
+- [11-Pipeline 模式——分步执行流程](11-Pipeline%20模式——分步执行流程.md) — Gate 机制，防止跳步骤
 
 ---
 
@@ -105,14 +105,14 @@ AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎
 
 **目标**：学会编写真正有用的 Skill
 
-- [12-不写已知知识——Agent 已经很聪明](./chapters/12-不写已知知识——Agent%20已经很聪明.md) — 补充 Agent 不知道的，而不是重复已知的
-- [13-Gotchas 坑点——最有价值的内容是踩过的坑](./chapters/13-Gotchas%20坑点——最有价值的内容是踩过的坑.md) — 踩坑记录的价值，让 Skill 真正有用
-- [14-文件组织与渐进式披露——Skill 是文件夹不是文件](./chapters/14-文件组织与渐进式披露——Skill%20是文件夹不是文件.md) — references 组织策略，实现精准加载
-- [15-避免过度约束——约束目标，不约束路径](./chapters/15-避免过度约束——约束目标，不约束路径.md) — 给 Agent 足够的自由度，不要过度限制
-- [16-设置流程与内存——让 Skill 有记忆](./chapters/16-设置流程与内存——让%20Skill%20有记忆.md) — config.json 与日志追加，让 Skill 有记忆
-- [17-脚本——给 Agent 可调用的代码](./chapters/17-脚本——给%20Agent%20可调用的代码.md) — 封装稳定能力，避免重复造轮子
-- [18-按需 Hooks——临时规则，会话隔离](./chapters/18-按需%20Hooks——临时规则，会话隔离.md) — PreToolUse hook，安全防护与监控
-- [19-实战案例——从 0 到 1 写一个 Skill](./chapters/19-实战案例——从%200%20到%201%20写一个%20Skill.md) — 从 0 到 1 完整案例，整合所学
+- [12-不写已知知识——Agent 已经很聪明](12-不写已知知识——Agent%20已经很聪明.md) — 补充 Agent 不知道的，而不是重复已知的
+- [13-Gotchas 坑点——最有价值的内容是踩过的坑](13-Gotchas%20坑点——最有价值的内容是踩过的坑.md) — 踩坑记录的价值，让 Skill 真正有用
+- [14-文件组织与渐进式披露——Skill 是文件夹不是文件](14-文件组织与渐进式披露——Skill%20是文件夹不是文件.md) — references 组织策略，实现精准加载
+- [15-避免过度约束——约束目标，不约束路径](15-避免过度约束——约束目标，不约束路径.md) — 给 Agent 足够的自由度，不要过度限制
+- [16-设置流程与内存——让 Skill 有记忆](16-设置流程与内存——让%20Skill%20有记忆.md) — config.json 与日志追加，让 Skill 有记忆
+- [17-脚本——给 Agent 可调用的代码](17-脚本——给%20Agent%20可调用的代码.md) — 封装稳定能力，避免重复造轮子
+- [18-按需 Hooks——临时规则，会话隔离](18-按需%20Hooks——临时规则，会话隔离.md) — PreToolUse hook，安全防护与监控
+- [19-实战案例——从 0 到 1 写一个 Skill](19-实战案例——从%200%20到%201%20写一个%20Skill.md) — 从 0 到 1 完整案例，整合所学
 
 ---
 
@@ -120,12 +120,12 @@ AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎
 
 **目标**：建立 Skill 的质量保障体系
 
-- [20-为什么需要评估——两个维护面与核心转变](./chapters/20-为什么需要评估——两个维护面与核心转变.md) — 没有评估的 Skill 只是假设
-- [21-两类 Skill 分类——补能力还是固化偏好？](./chapters/21-两类%20Skill%20分类——补能力还是固化偏好？.md) — Capability Uplift vs Encoded Preference
-- [22-七步生命周期——从草稿到迭代闭环](./chapters/22-七步生命周期——从草稿到迭代闭环.md) — 从草稿到迭代闭环的标准流程
-- [23-两类评分器——确定性检查与评分细则检查](./chapters/23-两类评分器——确定性检查与评分细则检查.md) — 确定性检查与评分细则检查
-- [24-六类评估指标——量化 Skill 表现](./chapters/24-六类评估指标——量化Skill表现.md) — 通过率、Token 消耗、执行时长、命令次数、重试率、错误分布
-- [25-A-B 对比测试——持续验证与优化](./chapters/25-A-B对比测试——持续验证与优化.md) — 版本对比、开关对比、模型对比
+- [20-为什么需要评估——两个维护面与核心转变](20-为什么需要评估——两个维护面与核心转变.md) — 没有评估的 Skill 只是假设
+- [21-两类 Skill 分类——补能力还是固化偏好？](21-两类%20Skill%20分类——补能力还是固化偏好？.md) — Capability Uplift vs Encoded Preference
+- [22-七步生命周期——从草稿到迭代闭环](22-七步生命周期——从草稿到迭代闭环.md) — 从草稿到迭代闭环的标准流程
+- [23-两类评分器——确定性检查与评分细则检查](23-两类评分器——确定性检查与评分细则检查.md) — 确定性检查与评分细则检查
+- [24-六类评估指标——量化 Skill 表现](24-六类评估指标——量化Skill表现.md) — 通过率、Token 消耗、执行时长、命令次数、重试率、错误分布
+- [25-A-B 对比测试——持续验证与优化](25-A-B对比测试——持续验证与优化.md) — 版本对比、开关对比、模型对比
 
 ---
 
@@ -133,19 +133,19 @@ AI 时代的红利属于"会动手的实践者"。如果你只想知道格式怎
 
 **目标**：让 Skill 在团队中长期稳定运行
 
-- [26-Skill 的长期维护与团队管理](./chapters/26-Skill%20的长期维护与团队管理.md) — 分发策略、市场机制、度量方法、依赖管理
-- [27-Skill 安全三原则——强大能力的风险管理](./chapters/27-Skill%20安全三原则——强大能力的风险管理.md) — 权限控制、输入验证、依赖管理
+- [26-Skill 的长期维护与团队管理](26-Skill%20的长期维护与团队管理.md) — 分发策略、市场机制、度量方法、依赖管理
+- [27-Skill 安全三原则——强大能力的风险管理](27-Skill%20安全三原则——强大能力的风险管理.md) — 权限控制、输入验证、依赖管理
 
 ---
 
 ### 附录
 
-- [附录1-Anthropic 的 9 大 Skill 分类——团队能力诊断地图](./appendices/附录1-Anthropic%20的%209%20大%20Skill%20分类——团队能力诊断地图.md) — Anthropic 官方 Skill 类型分类体系（认知→生产→验证→交付）
-- [附录2-OpenAI 的 Skill 实践案例——代码助手能力构建](./appendices/附录2-OpenAI的Skill实践案例——代码助手能力构建.md) — OpenAI Codex 真实 Skill 库（持续监控 + Subagent 并行审查 + 注意力量化 + 失败路径设计）
-- [附录3-Superpowers 开源 Skill 库——社区驱动的能力复用](./appendices/附录3-Superpowers开源Skill库——社区驱动的能力复用.md) — 社区驱动完整工程纪律系统（Red Flags 表 + Iron Law + Hard Gate + 文件传递 + Progress Ledger）
-- [附录4-addyosmani-agent-skills——生产级 Skill 工作流设计](./appendices/附录4-addyosmani-agent-skills——生产级Skill工作流设计.md) — Google 工程总监 Addy Osmani 的生产级 Skill 工作流库
-- [附录5-garrytan-gstack——创业者导向的完整产品研发流程](./appendices/附录5-garrytan-gstack——创业者导向的完整产品研发流程.md) — YC 总裁 Garry Tan 的单人全栈工程体系（四大基石：Ethos 注入 + preamble-tier 编排 + Preamble Bash + GBrain Schema 跨会话记忆）
-- [附录6-google-skills——平台化产品的安全 Agent 入口设计](./appendices/附录6-google-skills——平台化产品的安全Agent入口设计.md) — Google 官方 Skill 库，35 个云端产品 Skill（安全护栏 + 数据缩减 + 强制前置验证 + 渐进式加载）
+- [附录1-Anthropic 的 9 大 Skill 分类——团队能力诊断地图](附录1-Anthropic%20的%209%20大%20Skill%20分类——团队能力诊断地图.md) — Anthropic 官方 Skill 类型分类体系（认知→生产→验证→交付）
+- [附录2-OpenAI 的 Skill 实践案例——代码助手能力构建](附录2-OpenAI的Skill实践案例——代码助手能力构建.md) — OpenAI Codex 真实 Skill 库（持续监控 + Subagent 并行审查 + 注意力量化 + 失败路径设计）
+- [附录3-Superpowers 开源 Skill 库——社区驱动的能力复用](附录3-Superpowers开源Skill库——社区驱动的能力复用.md) — 社区驱动完整工程纪律系统（Red Flags 表 + Iron Law + Hard Gate + 文件传递 + Progress Ledger）
+- [附录4-addyosmani-agent-skills——生产级 Skill 工作流设计](附录4-addyosmani-agent-skills——生产级Skill工作流设计.md) — Google 工程总监 Addy Osmani 的生产级 Skill 工作流库
+- [附录5-garrytan-gstack——创业者导向的完整产品研发流程](附录5-garrytan-gstack——创业者导向的完整产品研发流程.md) — YC 总裁 Garry Tan 的单人全栈工程体系（四大基石：Ethos 注入 + preamble-tier 编排 + Preamble Bash + GBrain Schema 跨会话记忆）
+- [附录6-google-skills——平台化产品的安全 Agent 入口设计](附录6-google-skills——平台化产品的安全Agent入口设计.md) — Google 官方 Skill 库，35 个云端产品 Skill（安全护栏 + 数据缩减 + 强制前置验证 + 渐进式加载）
 
 ---
 

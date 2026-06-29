@@ -39,7 +39,7 @@
 ## 💡 Pipeline 的解决方案
 
 **核心思想**：直接把 SKILL.md 写成工作流，每一步都有验证。
-![Pipeline 模式](../images/pipeline-pattern.png)
+![Pipeline 模式](pipeline-pattern.png)
 
 **设计要点**：
 
@@ -359,7 +359,7 @@ fi
 ## 🧭 五种模式如何选型
 
 真正写 Skill 时，不是先问“我喜欢哪种模式”，而是先判断任务本身的结构。
-![五种模式选型指南](../images/pattern-selection-guide.png)
+![五种模式选型指南](pattern-selection-guide.png)
 
 ### 选型判断树
 
